@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BusWatch Home — 설정</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, 'Pretendard', sans-serif; background: #121212; color: #e0e0e0; padding: 24px; max-width: 600px; margin: 0 auto; }
+    h1 { font-size: 24px; margin-bottom: 24px; color: #42A5F5; }
+    h2 { font-size: 18px; margin: 20px 0 12px; color: #90CAF9; }
+    .card { background: #1e1e1e; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .current { display: flex; justify-content: space-between; align-items: center; }
+    .current .label { color: #78909C; font-size: 14px; }
+    .current .value { font-size: 20px; font-weight: bold; }
+    input { width: 100%; padding: 12px; border: 1px solid #333; border-radius: 8px; background: #2a2a2a; color: #fff; font-size: 16px; margin-bottom: 8px; outline: none; }
+    input:focus { border-color: #42A5F5; }
+    button { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; transition: background 0.2s; }
+    .btn-primary { background: #1E88E5; color: #fff; width: 100%; }
+    .btn-primary:hover { background: #1565C0; }
+    .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+    .btn-save { background: #66BB6A; }
+    .btn-save:hover { background: #43A047; }
+    .results { max-height: 300px; overflow-y: auto; margin-top: 8px; }
+    .result-item { padding: 12px; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; transition: background 0.15s; }
+    .result-item:hover { background: #2a2a2a; }
+    .result-item .name { font-weight: bold; }
+    .result-item .meta { color: #78909C; font-size: 13px; }
+    .route-item { padding: 10px 12px; border-bottom: 1px solid #333; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: background 0.15s; border-radius: 8px; margin-bottom: 4px; }
+    .route-item:hover { background: #2a2a2a; }
+    .route-item.selected { background: #1E88E5; }
+    .status { padding: 12px; border-radius: 8px; text-align: center; margin-top: 12px; display: none; }
+    .status.ok { background: #2E7D32; display: block; }
+    .status.error { background: #C62828; display: block; }
+    .hidden { display: none; }
+    .step-indicator { color: #78909C; font-size: 13px; margin-bottom: 8px; }
+    .loading { color: #78909C; padding: 12px; text-align: center; }
+    .voice-hint { background: #263238; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: #78909C; line-height: 1.6; }
+    .voice-hint code { background: #37474F; padding: 2px 6px; border-radius: 4px; color: #80CBC4; }
+  </style>
+</head>
+<body>
+  <h1>🚌 BusWatch Home 설정</h1>
+
+  <!-- 현재 설정 -->
+  <div class="card" id="currentSettings">
+    <h2>현재 설정</h2>
+    <div class="current" style="margin-bottom:8px">
+      <div><span class="label">정류소</span><br><span class="value" id="curStation">로딩중...</span></div>
+      <div style="text-align:right"><span class="label">정류소 ID</span><br><span id="curStationId">-</span></div>
+    </div>
+    <div class="current">
+      <div><span class="label">노선</span><br><span class="value" id="curRoute">로딩중...</span></div>
+      <div style="text-align:right"><span class="label">노선 ID</span><br><span id="curRouteId">-</span></div>
+    </div>
+    <div class="voice-hint">
+      음성 호출: <code>Alexa, open my bus</code><br>
+      도착 조회: <code>Alexa, ask my bus for next bus</code>
+    </div>
+  </div>
+
+  <!-- Step 1: 정류소 검색 -->
+  <div class="card">
+    <h2>Step 1 — 정류소 검색</h2>
+    <p class="step-indicator">정류소 이름 또는 번호로 검색하세요</p>
+    <input type="text" id="searchInput" placeholder="예: 목감중심상업지구, 25602" />
+    <button class="btn-primary" id="searchBtn" onclick="searchStations()">검색</button>
+    <div class="results" id="stationResults"></div>
+  </div>
+
+  <!-- Step 2: 노선 선택 -->
+  <div class="card hidden" id="routeSection">
+    <h2>Step 2 — 노선 선택</h2>
+    <p class="step-indicator">선택한 정류소: <strong id="selectedStationName">-</strong></p>
+    <div class="results" id="routeResults"></div>
+  </div>
+
+  <!-- Step 3: 저장 -->
+  <div class="card hidden" id="saveSection">
+    <h2>Step 3 — 저장</h2>
+    <p style="margin-bottom:12px">
+      정류소: <strong id="confirmStation">-</strong><br>
+      노선: <strong id="confirmRoute">-</strong>
+    </p>
+    <button class="btn-primary btn-save" onclick="saveSettings()">설정 저장</button>
+    <div class="status" id="saveStatus"></div>
+  </div>
+
+<script>
+let selected = { stationId: null, stationName: '', routeId: null, routeName: '', routeTypeName: '' };
+
+async function loadCurrent() {
+  try {
+    const res = await fetch('/api/settings');
+    const d = await res.json();
+    document.getElementById('curStation').textContent = d.station_name;
+    document.getElementById('curStationId').textContent = d.station_id;
+    document.getElementById('curRoute').textContent = d.route_name;
+    document.getElementById('curRouteId').textContent = d.route_id;
+  } catch (e) {
+    document.getElementById('curStation').textContent = '로드 실패';
+  }
+}
+
+async function searchStations() {
+  const kw = document.getElementById('searchInput').value.trim();
+  if (!kw) return;
+  const btn = document.getElementById('searchBtn');
+  const div = document.getElementById('stationResults');
+  btn.disabled = true;
+  btn.textContent = '검색 중...';
+  div.innerHTML = '<p class="loading">검색 중...</p>';
+  try {
+    const res = await fetch('/api/stations/search?keyword=' + encodeURIComponent(kw));
+    const stations = await res.json();
+    if (!stations.length) {
+      div.innerHTML = '<p style="padding:12px;color:#78909C">검색 결과가 없습니다</p>';
+      return;
+    }
+    div.innerHTML = stations.map(s => `
+      <div class="result-item" onclick="selectStation(${s.stationId}, '${esc(s.stationName)}', '${esc(s.mobileNo)}')">
+        <div><span class="name">${esc(s.stationName)}</span><br><span class="meta">${esc(s.regionName)}</span></div>
+        <div style="text-align:right"><span class="meta">번호 ${esc(s.mobileNo)}</span><br><span class="meta">ID ${s.stationId}</span></div>
+      </div>`).join('');
+  } catch (e) {
+    div.innerHTML = '<p style="padding:12px;color:#EF5350">검색 오류: ' + e.message + '</p>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '검색';
+  }
+}
+
+async function selectStation(id, name, mobileNo) {
+  selected.stationId = id;
+  selected.stationName = name;
+  document.getElementById('selectedStationName').textContent = name + ' (' + mobileNo + ')';
+  document.getElementById('routeSection').classList.remove('hidden');
+  document.getElementById('saveSection').classList.add('hidden');
+  const div = document.getElementById('routeResults');
+  div.innerHTML = '<p class="loading">노선 로딩 중...</p>';
+  try {
+    const res = await fetch('/api/stations/' + id + '/routes');
+    const routes = await res.json();
+    if (!routes.length) {
+      div.innerHTML = '<p style="padding:12px;color:#78909C">경유 노선이 없습니다</p>';
+      return;
+    }
+    div.innerHTML = routes.map(r => `
+      <div class="route-item" id="route-${r.routeId}" onclick="selectRoute(${r.routeId}, '${esc(String(r.routeName))}', '${esc(r.routeTypeName)}')">
+        <div><strong>${esc(String(r.routeName))}</strong><br><span class="meta">${esc(r.routeTypeName)}</span></div>
+        <div style="text-align:right"><span class="meta">${esc(r.routeDestName)}</span></div>
+      </div>`).join('');
+  } catch (e) {
+    div.innerHTML = '<p style="padding:12px;color:#EF5350">노선 조회 오류</p>';
+  }
+}
+
+function selectRoute(id, name, typeName) {
+  selected.routeId = id;
+  selected.routeName = name;
+  selected.routeTypeName = typeName;
+  document.querySelectorAll('.route-item').forEach(el => el.classList.remove('selected'));
+  document.getElementById('route-' + id).classList.add('selected');
+  document.getElementById('confirmStation').textContent = selected.stationName + ' (' + selected.stationId + ')';
+  document.getElementById('confirmRoute').textContent = name + ' (' + id + ')';
+  document.getElementById('saveSection').classList.remove('hidden');
+  document.getElementById('saveStatus').className = 'status';
+  document.getElementById('saveStatus').style.display = 'none';
+}
+
+async function saveSettings() {
+  const st = document.getElementById('saveStatus');
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        station_id: selected.stationId,
+        station_name: selected.stationName,
+        route_id: selected.routeId,
+        route_name: selected.routeName,
+        route_type_name: selected.routeTypeName
+      })
+    });
+    if (res.ok) {
+      st.className = 'status ok';
+      st.textContent = '✅ 저장 완료! Alexa에서 바로 반영됩니다.';
+      loadCurrent();
+    } else {
+      st.className = 'status error';
+      st.textContent = '❌ 저장 실패';
+    }
+  } catch (e) {
+    st.className = 'status error';
+    st.textContent = '❌ 네트워크 오류';
+  }
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') searchStations(); });
+loadCurrent();
+</script>
+</body>
+</html>

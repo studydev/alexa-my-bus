@@ -1,0 +1,311 @@
+{
+  "type": "APL",
+  "version": "2024.3",
+  "license": "BusWatch Home APL Template",
+  "theme": "dark",
+  "import": [
+    {
+      "name": "alexa-layouts",
+      "version": "1.7.0"
+    }
+  ],
+  "resources": [
+    {
+      "colors": {
+        "busBlue": "#1976D2",
+        "busRed": "#D32F2F",
+        "busGreen": "#388E3C",
+        "textPrimary": "#FFFFFF",
+        "textSecondary": "#90A4AE",
+        "textDim": "#546E7A",
+        "bgDark": "#0D1117",
+        "bgCard": "#161B22",
+        "accentGreen": "#4CAF50",
+        "accentOrange": "#FF9800",
+        "accentRed": "#F44336"
+      }
+    }
+  ],
+  "mainTemplate": {
+    "parameters": ["busData"],
+    "items": [
+      {
+        "type": "Container",
+        "width": "100vw",
+        "height": "100vh",
+        "direction": "column",
+        "alignItems": "center",
+        "items": [
+          {
+            "type": "Container",
+            "width": "100%",
+            "alignItems": "center",
+            "paddingTop": "56dp",
+            "paddingBottom": "16dp",
+            "items": [
+              {
+                "type": "Frame",
+                "width": "280dp",
+                "height": "120dp",
+                "backgroundColor": "${busData.routeType == 'red' ? '@busRed' : (busData.routeType == 'green' ? '@busGreen' : '@busBlue')}",
+                "borderRadius": "24dp",
+                "alignSelf": "center",
+                "items": [
+                  {
+                    "type": "Container",
+                    "width": "100%",
+                    "height": "100%",
+                    "alignItems": "center",
+                    "justifyContent": "center",
+                    "items": [
+                      {
+                        "type": "Text",
+                        "text": "${busData.routeName}",
+                        "fontSize": "56dp",
+                        "fontWeight": "900",
+                        "color": "@textPrimary",
+                        "textAlign": "center"
+                      },
+                      {
+                        "type": "Frame",
+                        "position": "absolute",
+                        "bottom": "0",
+                        "width": "280dp",
+                        "height": "16dp",
+                        "backgroundColor": "${busData.routeType == 'red' ? '#B71C1C' : (busData.routeType == 'green' ? '#1B5E20' : '#0D47A1')}",
+                        "borderBottomLeftRadius": "24dp",
+                        "borderBottomRightRadius": "24dp"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Text",
+                "text": "${busData.stationName}",
+                "fontSize": "28dp",
+                "color": "@textSecondary",
+                "paddingTop": "12dp",
+                "textAlign": "center"
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "width": "100%",
+            "grow": 1,
+            "alignItems": "center",
+            "justifyContent": "center",
+            "paddingLeft": "48dp",
+            "paddingRight": "48dp",
+            "items": [
+              {
+                "when": "${busData.flag == 'PASS' || busData.flag == 'STOP'}",
+                "type": "Container",
+                "alignItems": "center",
+                "items": [
+                  {
+                    "type": "Text",
+                    "text": "${busData.flag == 'PASS' ? '🌙' : '⏳'}",
+                    "fontSize": "64dp",
+                    "textAlign": "center"
+                  },
+                  {
+                    "type": "Text",
+                    "text": "${busData.flag == 'PASS' ? '운행이 종료되었습니다' : '운행 준비 중입니다'}",
+                    "fontSize": "36dp",
+                    "color": "@textSecondary",
+                    "textAlign": "center",
+                    "paddingTop": "16dp"
+                  }
+                ]
+              },
+              {
+                "when": "${busData.flag == 'RUN' || busData.flag == 'WAIT'}",
+                "type": "Container",
+                "width": "100%",
+                "direction": "row",
+                "justifyContent": "spaceAround",
+                "alignItems": "center",
+                "items": [
+                  {
+                    "type": "Container",
+                    "alignItems": "center",
+                    "grow": 1,
+                    "items": [
+                      {
+                        "type": "Text",
+                        "text": "다음 버스",
+                        "fontSize": "22dp",
+                        "color": "@textSecondary",
+                        "textAlign": "center"
+                      },
+                      {
+                        "type": "Container",
+                        "direction": "row",
+                        "alignItems": "end",
+                        "justifyContent": "center",
+                        "paddingTop": "8dp",
+                        "items": [
+                          {
+                            "type": "Text",
+                            "text": "${busData.predictTime1 != null ? busData.predictTime1 : '--'}",
+                            "fontSize": "100dp",
+                            "fontWeight": "900",
+                            "color": "${busData.predictTime1 != null && busData.predictTime1 <= 3 ? '@accentRed' : (busData.predictTime1 != null && busData.predictTime1 <= 7 ? '@accentOrange' : '@accentGreen')}"
+                          },
+                          {
+                            "type": "Text",
+                            "text": "분",
+                            "fontSize": "32dp",
+                            "color": "@textSecondary",
+                            "paddingLeft": "6dp",
+                            "paddingBottom": "18dp"
+                          }
+                        ]
+                      },
+                      {
+                        "when": "${busData.locationNo1 != null}",
+                        "type": "Text",
+                        "text": "${busData.locationNo1}개 정류소 전 · ${busData.stationNm1}",
+                        "fontSize": "18dp",
+                        "color": "@textDim",
+                        "textAlign": "center",
+                        "paddingTop": "4dp"
+                      },
+                      {
+                        "when": "${busData.lowPlate1 == '1'}",
+                        "type": "Text",
+                        "text": "♿ 저상버스",
+                        "fontSize": "18dp",
+                        "color": "${busData.routeType == 'red' ? '@busRed' : '@busBlue'}",
+                        "paddingTop": "4dp"
+                      }
+                    ]
+                  },
+                  {
+                    "when": "${busData.predictTime2 != null}",
+                    "type": "Frame",
+                    "width": "2dp",
+                    "height": "120dp",
+                    "backgroundColor": "#2D333B"
+                  },
+                  {
+                    "when": "${busData.predictTime2 != null}",
+                    "type": "Container",
+                    "alignItems": "center",
+                    "grow": 1,
+                    "items": [
+                      {
+                        "type": "Text",
+                        "text": "다다음 버스",
+                        "fontSize": "22dp",
+                        "color": "@textSecondary",
+                        "textAlign": "center"
+                      },
+                      {
+                        "type": "Container",
+                        "direction": "row",
+                        "alignItems": "end",
+                        "justifyContent": "center",
+                        "paddingTop": "8dp",
+                        "items": [
+                          {
+                            "type": "Text",
+                            "text": "${busData.predictTime2}",
+                            "fontSize": "72dp",
+                            "fontWeight": "900",
+                            "color": "@textPrimary"
+                          },
+                          {
+                            "type": "Text",
+                            "text": "분",
+                            "fontSize": "28dp",
+                            "color": "@textSecondary",
+                            "paddingLeft": "6dp",
+                            "paddingBottom": "12dp"
+                          }
+                        ]
+                      },
+                      {
+                        "when": "${busData.locationNo2 != null}",
+                        "type": "Text",
+                        "text": "${busData.locationNo2}개 정류소 전 · ${busData.stationNm2}",
+                        "fontSize": "18dp",
+                        "color": "@textDim",
+                        "textAlign": "center",
+                        "paddingTop": "4dp"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "when": "${busData.flag == 'ERROR'}",
+                "type": "Container",
+                "alignItems": "center",
+                "items": [
+                  {
+                    "type": "Text",
+                    "text": "⚠️",
+                    "fontSize": "64dp"
+                  },
+                  {
+                    "type": "Text",
+                    "text": "정보를 가져올 수 없습니다",
+                    "fontSize": "32dp",
+                    "color": "@accentRed",
+                    "textAlign": "center",
+                    "paddingTop": "16dp"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "width": "100%",
+            "direction": "row",
+            "justifyContent": "spaceBetween",
+            "alignItems": "center",
+            "paddingLeft": "24dp",
+            "paddingRight": "24dp",
+            "paddingBottom": "12dp",
+            "items": [
+              {
+                "type": "Text",
+                "text": "BusWatch Home",
+                "fontSize": "14dp",
+                "color": "#384048"
+              },
+              {
+                "type": "Text",
+                "text": "갱신 ${busData.lastUpdated}",
+                "fontSize": "14dp",
+                "color": "#384048"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "onMount": [
+    {
+      "type": "SendEvent",
+      "delay": 60000,
+      "arguments": ["refresh"]
+    }
+  ],
+  "handleTick": [
+    {
+      "minimumDelay": 60000,
+      "commands": [
+        {
+          "type": "SendEvent",
+          "arguments": ["refresh"]
+        }
+      ]
+    }
+  ]
+}
