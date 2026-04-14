@@ -3,7 +3,7 @@
     "apis": {
       "custom": {
         "endpoint": {
-          "uri": "https://YOUR_DOMAIN/alexa",
+          "uri": "https://bus.studydev.com/alexa",
           "sslCertificateType": "Trusted"
         },
         "interfaces": [
@@ -31,9 +31,9 @@
           "summary": "Real-time bus arrival display for Echo Show.",
           "description": "Shows real-time bus arrival info on your Echo Show display.",
           "examplePhrases": [
-            "Alexa, open my bus",
-            "Alexa, ask my bus for next bus",
-            "Alexa, ask my bus when is the bus"
+            "Alexa, open next bus",
+            "Alexa, ask next bus for arrival time",
+            "Alexa, ask next bus when is the bus"
           ],
           "keywords": ["bus", "arrival", "transit", "commute"]
         }

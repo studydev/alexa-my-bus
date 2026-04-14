@@ -3,7 +3,7 @@
 Echo Show 10/15에서 실시간 버스 도착 정보를 표시하는 Alexa Custom Skill.
 
 ```
-"Alexa, open my bus"
+"Alexa, open next bus"
 ```
 
 경기도 버스 도착 정보를 Echo Show 디스플레이에 한눈에 보여줍니다.
@@ -49,7 +49,8 @@ echo-bus/
 │   │       └── settings.html         # 정류소/노선 설정 웹 UI
 │   ├── requirements.txt
 │   ├── Dockerfile
-│   └── docker-compose.yml
+│   ├── docker-compose.yml            # 이미지 빌드 전용
+│   └── docker-compose.truenas.yml    # TrueNAS Custom App 실행용
 └── skill-package/
     ├── skill.json                    # Alexa Skill 매니페스트 (en-US)
     └── interactionModels/custom/
@@ -63,11 +64,12 @@ echo-bus/
 | 실시간 도착 표시 | 다음 버스 / 다다음 버스 도착 시간 (분) |
 | APL 디스플레이 | 다크 테마, 버스 타입별 색상 (파란/빨간/초록) |
 | 자동 갱신 | APL handleTick + SendEvent로 60초 간격 |
+| 세션 유지 | reprompt + handleTick으로 5분간 화면 유지 |
 | 도착 시간 컬러코딩 | 3분 이하 빨강, 7분 이하 주황, 그 외 초록 |
 | 한국어 표시 | 디스플레이·TTS 모두 한국어 |
-| 영어 호출 | "Alexa, open my bus" (en-US) |
+| 영어 호출 | "Alexa, open next bus" (en-US) |
 | 설정 UI | 웹에서 정류소/노선 변경 가능 (`/settings`) |
-| 운행 종료 표시 | 심야 등 운행 종료 시 🌙 + 안내 메시지 |
+| 운행 종료 표시 | 심야 등 운행 종료 시 🌙 + 안내 메시지 (PASS flag + 도착 예정 시간 없을 때) |
 | 오류 처리 | API 장애 시 ⚠️ + 오류 화면 표시 |
 
 ## 버스 색상 구분
@@ -97,9 +99,9 @@ GBIS API의 `routeTypeName`을 기반으로 자동 분류됩니다.
 
 | 명령 | 예시 |
 |------|------|
-| 스킬 열기 | "Alexa, open my bus" |
-| 도착 조회 | "Alexa, ask my bus for next bus" |
-| 도움말 | "Alexa, ask my bus for help" |
+| 스킬 열기 | "Alexa, open next bus" |
+| 도착 조회 | "Alexa, ask next bus for arrival time" |
+| 도움말 | "Alexa, ask next bus for help" |
 | 종료 | "Alexa, stop" |
 
 ---
@@ -134,35 +136,37 @@ open http://localhost:8080/settings
 
 1. [developer.amazon.com](https://developer.amazon.com/alexa/console/ask) 접속
 2. **Create Skill** → Custom → Provision your own
-3. **Invocation Name**: `my bus`
+3. **Invocation Name**: `next bus`
 4. **JSON Editor**: `skill-package/interactionModels/custom/en-US.json` 붙여넣기
 5. **Endpoint** → HTTPS:
    - Default Region: `https://<YOUR_DOMAIN>/alexa`
    - SSL: "My development endpoint has a certificate from a trusted certificate authority"
 6. **Interfaces** → Alexa Presentation Language 활성화
 7. **Save** → **Build** → **Test** 탭에서 Development 모드
-8. 테스트: "open my bus"
+8. 테스트: "open next bus"
 
 ### 업데이트 배포
 
-```bash
-# 개발 머신에서
-cd <LOCAL_PROJECT_DIR>
-rsync -avz --exclude '.venv' --exclude '__pycache__' --exclude '.git' --exclude 'settings.json' \
-  . <USER>@<TRUENAS_IP>:<TRUENAS_APP_DIR>/
+배포는 3단계로 진행합니다. 실행 관리는 TrueNAS Custom App에서 합니다.
 
-# TrueNAS에서
-cd <TRUENAS_APP_DIR>/backend
-sudo docker compose build && sudo docker compose up -d --force-recreate
+```bash
+# 1. 파일 전송
+rsync -avz --delete backend/ studydev@192.168.1.92:/mnt/workspace/custom_apps/echo-bus/backend/
+
+# 2. 이미지 빌드 (서버에서)
+ssh studydev@192.168.1.92 "cd /mnt/workspace/custom_apps/echo-bus/backend && sudo docker compose build"
+
+# 3. TrueNAS 웹 UI → Apps → bus-watch → 재시작
 ```
 
 ### 컨테이너 관리
 
+TrueNAS 웹 UI (Apps 페이지)에서 bus-watch 앱의 시작/중지/재시작을 관리합니다.
+
+SSH로 로그 확인:
+
 ```bash
-sudo docker compose stop        # 중지
-sudo docker compose restart     # 재시작
-sudo docker compose down --rmi all  # 완전 삭제
-sudo docker compose logs --tail 50 buswatch  # 로그
+sudo docker logs --tail 50 buswatch-backend  # 로그
 ```
 
 ---
@@ -202,7 +206,7 @@ sudo docker compose logs --tail 50 buswatch  # 로그
 - **GBIS API 클라이언트**: httpx (비동기)
 - **Alexa SDK**: ask-sdk-core + ask-sdk-webservice-support
 - **디스플레이**: APL 2024.3
-- **배포**: Docker / docker-compose (TrueNAS)
+- **배포**: Docker / TrueNAS Custom App
 - **리버스 프록시**: Apache 2.4 (<PROXY_IP>)
 - **SSL**: acme.sh (Let's Encrypt, EC-256)
 - **설정**: pydantic-settings + settings.json 동적 오버라이드

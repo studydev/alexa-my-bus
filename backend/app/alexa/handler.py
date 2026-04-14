@@ -64,7 +64,7 @@ def _build_apl_datasource(info: BusArrivalInfo) -> dict:
 
 
 def _build_speech(info: BusArrivalInfo) -> str:
-    if info.flag in ("PASS", "STOP"):
+    if info.flag == "STOP" or (info.flag == "PASS" and info.predict_time1 is None):
         return f"{info.route_name}번 버스는 현재 운행이 종료되었습니다."
     if info.predict_time1 is None:
         return f"{info.route_name}번 버스 도착 정보가 없습니다."
@@ -115,7 +115,8 @@ def _fetch_arrival_sync() -> BusArrivalInfo:
 
 
 def _error_arrival_info() -> BusArrivalInfo:
-    from datetime import datetime
+    from datetime import datetime, timezone, timedelta
+    KST = timezone(timedelta(hours=9))
     return BusArrivalInfo(
         route_name=get_active_route_name(),
         station_name=get_active_station_name(),
@@ -132,7 +133,7 @@ def _error_arrival_info() -> BusArrivalInfo:
         flag="ERROR",
         crowded1="",
         crowded2="",
-        last_updated=datetime.now().strftime("%H:%M"),
+        last_updated=datetime.now(KST).strftime("%H:%M"),
     )
 
 
@@ -156,6 +157,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
             .speak(speech)
+            .ask(" ")
             .set_should_end_session(False)
             .response
         )
@@ -178,6 +180,7 @@ class BusArrivalIntentHandler(AbstractRequestHandler):
         return (
             handler_input.response_builder
             .speak(speech)
+            .ask(" ")
             .set_should_end_session(False)
             .response
         )

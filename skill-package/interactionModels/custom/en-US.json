@@ -1,19 +1,20 @@
 {
   "interactionModel": {
     "languageModel": {
-      "invocationName": "my bus",
+      "invocationName": "next bus",
       "intents": [
         {
           "name": "BusArrivalIntent",
           "samples": [
-            "next bus",
             "when is the next bus",
             "bus arrival",
             "check the bus",
             "show bus info",
             "bus time",
             "when does the bus come",
-            "how long until the bus"
+            "how long until the bus",
+            "arrival time",
+            "show arrival info"
           ]
         },
         {"name": "AMAZON.HelpIntent", "samples": []},

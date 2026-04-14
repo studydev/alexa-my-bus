@@ -100,7 +100,7 @@
             "paddingRight": "48dp",
             "items": [
               {
-                "when": "${busData.flag == 'PASS' || busData.flag == 'STOP'}",
+                "when": "${(busData.flag == 'PASS' && busData.predictTime1 == null) || busData.flag == 'STOP'}",
                 "type": "Container",
                 "alignItems": "center",
                 "items": [
@@ -121,7 +121,7 @@
                 ]
               },
               {
-                "when": "${busData.flag == 'RUN' || busData.flag == 'WAIT'}",
+                "when": "${busData.flag == 'RUN' || busData.flag == 'WAIT' || (busData.flag == 'PASS' && busData.predictTime1 != null)}",
                 "type": "Container",
                 "width": "100%",
                 "direction": "row",

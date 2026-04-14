@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from urllib.parse import unquote
+
+KST = timezone(timedelta(hours=9))
 
 import httpx
 
@@ -74,7 +76,7 @@ async def get_bus_arrival(
         raise RuntimeError(f"GBIS API error: {header['resultMessage']}")
 
     item = data["response"]["msgBody"]["busArrivalItem"]
-    now = datetime.now().strftime("%H:%M")
+    now = datetime.now(KST).strftime("%H:%M")
 
     return BusArrivalInfo(
         route_name=str(item.get("routeName", active_route_name)),

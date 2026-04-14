@@ -1,0 +1,17 @@
+services:
+  buswatch:
+    image: backend-buswatch:latest
+    pull_policy: never
+    container_name: buswatch-backend
+    ports:
+      - "8081:8080"
+    env_file:
+      - /mnt/workspace/custom_apps/echo-bus/.env
+    volumes:
+      - /mnt/workspace/custom_apps/echo-bus/settings.json:/app/settings.json
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
