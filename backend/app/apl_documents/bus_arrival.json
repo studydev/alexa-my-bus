@@ -1,7 +1,7 @@
 {
   "type": "APL",
   "version": "2024.3",
-  "license": "BusWatch Home APL Template",
+  "license": "BusWatch Home APL Template — Responsive",
   "theme": "dark",
   "import": [
     {
@@ -34,6 +34,49 @@
         "tempMax": "#FF8A4D",
         "tempMin": "#6EBBFF",
         "footerText": "#485968"
+      },
+      "dimensions": {
+        "panelPad": "2vw",
+        "panelRadius": "3.5vh",
+        "cardRadius": "3vh",
+        "chipRadius": "2.5vh",
+        "gapSm": "1.2vh",
+        "gapMd": "1.8vh",
+        "gapLg": "2vh",
+        "fontHuge": "14vh",
+        "fontXL": "12vh",
+        "fontLg": "9vh",
+        "fontRoute": "5.5vh",
+        "fontStat": "4.2vh",
+        "fontCity": "3.8vh",
+        "fontDesc": "2.8vh",
+        "fontLabel": "2vh",
+        "fontBody": "2.2vh",
+        "fontCaption": "1.8vh",
+        "fontMicro": "1.5vh",
+        "badgeW": "55%",
+        "badgeH": "11vh",
+        "weatherHeroHeight": "31vh",
+        "weatherStatsHeight": "12.5vh",
+        "weatherCity": "3.2vh",
+        "weatherEmoji": "9.5vh",
+        "weatherTemp": "8vh",
+        "weatherDegree": "3.8vh",
+        "weatherDesc": "2vh",
+        "weatherStatValue": "3.2vh",
+        "weatherSummaryTemp": "3.4vh",
+        "weatherSummaryMeta": "1.8vh",
+        "weatherForecastTemp": "1.9vh",
+        "weatherForecastEmoji": "2.6vh",
+        "weatherSectionGap": "1.2vh",
+        "fontCaptionDouble": "3.6vh",
+        "fontMicroDouble": "3vh",
+        "weatherSummaryLabelTriple": "5.4vh",
+        "weatherSummaryTempTriple": "10.2vh",
+        "weatherSummaryMetaDouble": "3.6vh",
+        "weatherHeroSpacer": "9.5vh",
+        "weatherStatLabel": "3vh",
+        "weatherDescDouble": "4vh"
       }
     }
   ],
@@ -43,16 +86,18 @@
       "items": [
         {
           "type": "Frame",
+          "width": "100%",
           "height": "100%",
           "backgroundColor": "@panelBus",
-          "borderRadius": "30dp",
-          "paddingLeft": "24dp",
-          "paddingRight": "24dp",
-          "paddingTop": "24dp",
-          "paddingBottom": "24dp",
+          "borderRadius": "@panelRadius",
+          "paddingLeft": "@panelPad",
+          "paddingRight": "@panelPad",
+          "paddingTop": "@panelPad",
+          "paddingBottom": "@panelPad",
           "items": [
             {
               "type": "Container",
+              "width": "100%",
               "height": "100%",
               "direction": "column",
               "alignItems": "center",
@@ -60,21 +105,23 @@
                 {
                   "type": "Text",
                   "text": "실시간 버스",
-                  "fontSize": "15dp",
+                  "fontSize": "@fontCaptionDouble",
                   "color": "@textDim",
-                  "textAlign": "center"
+                  "textAlign": "center",
+                  "width": "100%"
                 },
                 {
                   "type": "Container",
+                  "width": "100%",
                   "alignItems": "center",
-                  "paddingTop": "18dp",
+                  "paddingTop": "@gapMd",
                   "items": [
                     {
                       "type": "Frame",
-                      "width": "216dp",
-                      "height": "88dp",
+                      "width": "@badgeW",
+                      "height": "@badgeH",
                       "backgroundColor": "${busData.routeType == 'red' ? '@busRed' : (busData.routeType == 'green' ? '@busGreen' : '@busBlue')}",
-                      "borderRadius": "22dp",
+                      "borderRadius": "@chipRadius",
                       "items": [
                         {
                           "type": "Container",
@@ -86,7 +133,7 @@
                             {
                               "type": "Text",
                               "text": "${busData.routeName}",
-                              "fontSize": "42dp",
+                              "fontSize": "@fontRoute",
                               "fontWeight": "900",
                               "color": "@textPrimary",
                               "textAlign": "center"
@@ -98,9 +145,9 @@
                     {
                       "type": "Text",
                       "text": "${busData.stationName}",
-                      "fontSize": "20dp",
+                      "fontSize": "@fontBody",
                       "color": "@textSecondary",
-                      "paddingTop": "12dp",
+                      "paddingTop": "@gapSm",
                       "textAlign": "center",
                       "maxLines": 2
                     }
@@ -117,11 +164,11 @@
                       "type": "Frame",
                       "width": "100%",
                       "backgroundColor": "${busData.predictTime1 != null && busData.predictTime1 <= 3 ? '#321317' : (busData.predictTime1 != null && busData.predictTime1 <= 7 ? '#372413' : '#112218')}",
-                      "borderRadius": "26dp",
-                      "paddingLeft": "22dp",
-                      "paddingRight": "22dp",
-                      "paddingTop": "22dp",
-                      "paddingBottom": "22dp",
+                      "borderRadius": "@cardRadius",
+                      "paddingLeft": "@panelPad",
+                      "paddingRight": "@panelPad",
+                      "paddingTop": "@gapLg",
+                      "paddingBottom": "@gapLg",
                       "items": [
                         {
                           "type": "Container",
@@ -131,7 +178,7 @@
                             {
                               "type": "Text",
                               "text": "다음 버스",
-                              "fontSize": "18dp",
+                              "fontSize": "@fontBody",
                               "color": "@textSecondary"
                             },
                             {
@@ -139,22 +186,22 @@
                               "direction": "row",
                               "alignItems": "end",
                               "justifyContent": "center",
-                              "paddingTop": "6dp",
+                              "paddingTop": "0.8vh",
                               "items": [
                                 {
                                   "type": "Text",
                                   "text": "${busData.predictTime1 != null ? busData.predictTime1 : '--'}",
-                                  "fontSize": "110dp",
+                                  "fontSize": "@fontHuge",
                                   "fontWeight": "900",
                                   "color": "${busData.predictTime1 != null && busData.predictTime1 <= 3 ? '@accentRed' : (busData.predictTime1 != null && busData.predictTime1 <= 7 ? '@accentOrange' : '@accentGreen')}"
                                 },
                                 {
                                   "type": "Text",
                                   "text": "분",
-                                  "fontSize": "30dp",
+                                  "fontSize": "@fontDesc",
                                   "color": "@textSecondary",
-                                  "paddingLeft": "6dp",
-                                  "paddingBottom": "20dp"
+                                  "paddingLeft": "0.5vw",
+                                  "paddingBottom": "2.5vh"
                                 }
                               ]
                             },
@@ -162,18 +209,18 @@
                               "when": "${busData.locationNo1 != null}",
                               "type": "Text",
                               "text": "${busData.locationNo1}개 전 · ${busData.stationNm1}",
-                              "fontSize": "16dp",
+                              "fontSize": "@fontLabel",
                               "color": "@textDim",
                               "textAlign": "center",
-                              "paddingTop": "4dp"
+                              "paddingTop": "0.5vh"
                             },
                             {
                               "when": "${busData.lowPlate1 == '1'}",
                               "type": "Text",
                               "text": "저상버스 운행",
-                              "fontSize": "14dp",
+                              "fontSize": "@fontCaption",
                               "color": "@textSecondary",
-                              "paddingTop": "10dp"
+                              "paddingTop": "1vh"
                             }
                           ]
                         }
@@ -183,7 +230,7 @@
                       "when": "${busData.predictTime2 != null}",
                       "type": "Frame",
                       "width": "100%",
-                      "height": "14dp",
+                      "height": "@gapMd",
                       "backgroundColor": "transparent"
                     },
                     {
@@ -191,11 +238,11 @@
                       "type": "Frame",
                       "width": "100%",
                       "backgroundColor": "#121B24",
-                      "borderRadius": "24dp",
-                      "paddingLeft": "22dp",
-                      "paddingRight": "22dp",
-                      "paddingTop": "18dp",
-                      "paddingBottom": "18dp",
+                      "borderRadius": "@cardRadius",
+                      "paddingLeft": "@panelPad",
+                      "paddingRight": "@panelPad",
+                      "paddingTop": "@gapMd",
+                      "paddingBottom": "@gapMd",
                       "items": [
                         {
                           "type": "Container",
@@ -205,7 +252,7 @@
                             {
                               "type": "Text",
                               "text": "다다음 버스",
-                              "fontSize": "16dp",
+                              "fontSize": "@fontLabel",
                               "color": "@textSecondary"
                             },
                             {
@@ -213,22 +260,22 @@
                               "direction": "row",
                               "alignItems": "end",
                               "justifyContent": "center",
-                              "paddingTop": "4dp",
+                              "paddingTop": "0.5vh",
                               "items": [
                                 {
                                   "type": "Text",
                                   "text": "${busData.predictTime2}",
-                                  "fontSize": "72dp",
+                                  "fontSize": "@fontLg",
                                   "fontWeight": "900",
                                   "color": "@textPrimary"
                                 },
                                 {
                                   "type": "Text",
                                   "text": "분",
-                                  "fontSize": "24dp",
+                                  "fontSize": "@fontBody",
                                   "color": "@textSecondary",
-                                  "paddingLeft": "6dp",
-                                  "paddingBottom": "14dp"
+                                  "paddingLeft": "0.5vw",
+                                  "paddingBottom": "1.8vh"
                                 }
                               ]
                             },
@@ -236,7 +283,7 @@
                               "when": "${busData.locationNo2 != null}",
                               "type": "Text",
                               "text": "${busData.locationNo2}개 전 · ${busData.stationNm2}",
-                              "fontSize": "15dp",
+                              "fontSize": "@fontCaption",
                               "color": "@textDim",
                               "textAlign": "center"
                             }
@@ -250,34 +297,36 @@
                   "when": "${(busData.flag == 'PASS' && busData.predictTime1 == null) || busData.flag == 'STOP'}",
                   "type": "Container",
                   "grow": 1,
+                  "width": "100%",
                   "justifyContent": "center",
                   "items": [
                     {
                       "type": "Frame",
                       "width": "100%",
                       "backgroundColor": "#121B24",
-                      "borderRadius": "26dp",
-                      "paddingLeft": "24dp",
-                      "paddingRight": "24dp",
-                      "paddingTop": "36dp",
-                      "paddingBottom": "36dp",
+                      "borderRadius": "@cardRadius",
+                      "paddingLeft": "@panelPad",
+                      "paddingRight": "@panelPad",
+                      "paddingTop": "4vh",
+                      "paddingBottom": "4vh",
                       "items": [
                         {
                           "type": "Container",
+                          "width": "100%",
                           "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
                               "text": "${busData.flag == 'PASS' ? '🌙' : '⏳'}",
-                              "fontSize": "72dp"
+                              "fontSize": "@fontLg"
                             },
                             {
                               "type": "Text",
                               "text": "${busData.flag == 'PASS' ? '운행이 종료되었습니다' : '운행 준비 중입니다'}",
-                              "fontSize": "24dp",
+                              "fontSize": "@fontDesc",
                               "color": "@textSecondary",
                               "textAlign": "center",
-                              "paddingTop": "12dp"
+                              "paddingTop": "@gapSm"
                             }
                           ]
                         }
@@ -289,34 +338,36 @@
                   "when": "${busData.flag == 'ERROR'}",
                   "type": "Container",
                   "grow": 1,
+                  "width": "100%",
                   "justifyContent": "center",
                   "items": [
                     {
                       "type": "Frame",
                       "width": "100%",
                       "backgroundColor": "#241214",
-                      "borderRadius": "26dp",
-                      "paddingLeft": "24dp",
-                      "paddingRight": "24dp",
-                      "paddingTop": "36dp",
-                      "paddingBottom": "36dp",
+                      "borderRadius": "@cardRadius",
+                      "paddingLeft": "@panelPad",
+                      "paddingRight": "@panelPad",
+                      "paddingTop": "4vh",
+                      "paddingBottom": "4vh",
                       "items": [
                         {
                           "type": "Container",
+                          "width": "100%",
                           "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
                               "text": "⚠️",
-                              "fontSize": "72dp"
+                              "fontSize": "@fontLg"
                             },
                             {
                               "type": "Text",
                               "text": "버스 정보를 불러올 수 없습니다",
-                              "fontSize": "24dp",
+                              "fontSize": "@fontDesc",
                               "color": "@accentRed",
                               "textAlign": "center",
-                              "paddingTop": "12dp"
+                              "paddingTop": "@gapSm"
                             }
                           ]
                         }
@@ -327,11 +378,63 @@
                 {
                   "type": "Text",
                   "text": "업데이트 ${busData.lastUpdated}",
-                  "fontSize": "12dp",
+                  "fontSize": "@fontMicroDouble",
                   "color": "@footerText",
                   "textAlign": "center",
                   "width": "100%",
-                  "paddingTop": "18dp"
+                  "paddingTop": "@gapMd"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "StatCard": {
+      "parameters": ["label", "value", "sub"],
+      "items": [
+        {
+          "type": "Frame",
+          "grow": 1,
+          "backgroundColor": "@weatherChip",
+          "borderRadius": "@chipRadius",
+          "paddingLeft": "1.2vw",
+          "paddingRight": "1.2vw",
+          "paddingTop": "1.2vh",
+          "paddingBottom": "1.2vh",
+          "items": [
+            {
+              "type": "Container",
+              "height": "100%",
+              "direction": "column",
+              "justifyContent": "spaceBetween",
+              "alignItems": "center",
+              "items": [
+                {
+                  "type": "Text",
+                  "text": "${label}",
+                  "fontSize": "@weatherStatLabel",
+                  "color": "@textDim",
+                  "textAlign": "center",
+                  "width": "100%"
+                },
+                {
+                  "type": "Text",
+                  "text": "${value}",
+                  "fontSize": "@weatherStatValue",
+                  "fontWeight": "900",
+                  "color": "@textPrimary",
+                  "textAlign": "center",
+                  "width": "100%"
+                },
+                {
+                  "when": "${sub}",
+                  "type": "Text",
+                  "text": "${sub}",
+                  "fontSize": "@fontMicro",
+                  "color": "@textSecondary",
+                  "textAlign": "center",
+                  "width": "100%"
                 }
               ]
             }
@@ -345,16 +448,14 @@
         {
           "when": "${!weatherData}",
           "type": "Frame",
+          "width": "100%",
           "height": "100%",
           "backgroundColor": "@panelWeather",
-          "borderRadius": "30dp",
-          "paddingLeft": "24dp",
-          "paddingRight": "24dp",
-          "paddingTop": "24dp",
-          "paddingBottom": "24dp",
+          "borderRadius": "@panelRadius",
           "items": [
             {
               "type": "Container",
+              "width": "100%",
               "height": "100%",
               "alignItems": "center",
               "justifyContent": "center",
@@ -362,14 +463,14 @@
                 {
                   "type": "Text",
                   "text": "🌡️",
-                  "fontSize": "72dp"
+                  "fontSize": "@fontLg"
                 },
                 {
                   "type": "Text",
                   "text": "날씨 정보를 불러올 수 없습니다",
-                  "fontSize": "24dp",
+                  "fontSize": "@fontDesc",
                   "color": "@textSecondary",
-                  "paddingTop": "12dp"
+                  "paddingTop": "@gapSm"
                 }
               ]
             }
@@ -378,16 +479,18 @@
         {
           "when": "${weatherData}",
           "type": "Frame",
+          "width": "100%",
           "height": "100%",
           "backgroundColor": "@panelWeather",
-          "borderRadius": "30dp",
-          "paddingLeft": "22dp",
-          "paddingRight": "22dp",
-          "paddingTop": "22dp",
-          "paddingBottom": "22dp",
+          "borderRadius": "@panelRadius",
+          "paddingLeft": "@panelPad",
+          "paddingRight": "@panelPad",
+          "paddingTop": "@panelPad",
+          "paddingBottom": "@panelPad",
           "items": [
             {
               "type": "Container",
+              "width": "100%",
               "height": "100%",
               "direction": "column",
               "alignItems": "center",
@@ -400,17 +503,18 @@
                     {
                       "type": "Text",
                       "text": "현재 날씨",
-                      "fontSize": "15dp",
+                      "fontSize": "@fontCaptionDouble",
                       "color": "@textDim",
-                      "textAlign": "center"
+                      "textAlign": "center",
+                      "width": "100%"
                     },
                     {
                       "type": "Text",
                       "text": "${weatherData.city ? weatherData.city : '현재 위치'}",
-                      "fontSize": "30dp",
+                      "fontSize": "@weatherCity",
                       "fontWeight": "900",
                       "color": "@textPrimary",
-                      "paddingTop": "4dp",
+                      "paddingTop": "0.5vh",
                       "textAlign": "center"
                     }
                   ]
@@ -418,22 +522,23 @@
                 {
                   "type": "Frame",
                   "width": "100%",
-                  "height": "16dp",
+                  "height": "@weatherSectionGap",
                   "backgroundColor": "transparent"
                 },
                 {
                   "type": "Frame",
                   "width": "100%",
-                  "height": "220dp",
+                  "height": "@weatherHeroHeight",
                   "backgroundColor": "@weatherHero",
-                  "borderRadius": "28dp",
-                  "paddingLeft": "24dp",
-                  "paddingRight": "24dp",
-                  "paddingTop": "22dp",
-                  "paddingBottom": "22dp",
+                  "borderRadius": "@cardRadius",
+                  "paddingLeft": "1.6vw",
+                  "paddingRight": "1.6vw",
+                  "paddingTop": "1.4vh",
+                  "paddingBottom": "1.4vh",
                   "items": [
                     {
                       "type": "Container",
+                      "width": "100%",
                       "height": "100%",
                       "direction": "row",
                       "justifyContent": "center",
@@ -441,51 +546,66 @@
                       "items": [
                         {
                           "type": "Container",
+                          "grow": 7,
                           "direction": "row",
                           "alignItems": "center",
+                          "justifyContent": "center",
                           "items": [
                             {
                               "type": "Text",
                               "text": "${weatherData.emoji}",
-                              "fontSize": "96dp",
-                              "paddingRight": "14dp"
+                              "fontSize": "@weatherEmoji",
+                              "paddingRight": "1vw"
+                            },
+                            {
+                              "type": "Frame",
+                              "width": "@weatherHeroSpacer",
+                              "height": "1dp",
+                              "backgroundColor": "transparent"
                             },
                             {
                               "type": "Container",
+                              "alignItems": "center",
                               "items": [
                                 {
                                   "type": "Text",
                                   "text": "오늘 날씨",
-                                  "fontSize": "16dp",
-                                  "color": "#D3E4EC"
+                                  "fontSize": "@fontCaptionDouble",
+                                  "color": "#D3E4EC",
+                                  "textAlign": "center",
+                                  "width": "100%"
                                 },
                                 {
                                   "type": "Container",
                                   "direction": "row",
                                   "alignItems": "end",
+                                  "justifyContent": "center",
+                                  "width": "100%",
                                   "items": [
                                     {
                                       "type": "Text",
                                       "text": "${weatherData.temp}",
-                                      "fontSize": "96dp",
+                                      "fontSize": "@weatherTemp",
                                       "fontWeight": "900",
                                       "color": "@textPrimary"
                                     },
                                     {
                                       "type": "Text",
                                       "text": "°",
-                                      "fontSize": "44dp",
+                                      "fontSize": "@weatherDegree",
                                       "color": "#D3E4EC",
-                                      "paddingBottom": "18dp"
+                                      "paddingBottom": "1.4vh"
                                     }
                                   ]
                                 },
                                 {
                                   "type": "Text",
                                   "text": "${weatherData.description}",
-                                  "fontSize": "22dp",
+                                  "fontSize": "@weatherDescDouble",
                                   "fontWeight": "700",
-                                  "color": "#E8F1F5"
+                                  "color": "#E8F1F5",
+                                  "textAlign": "center",
+                                  "width": "100%"
                                 }
                               ]
                             }
@@ -493,23 +613,24 @@
                         },
                         {
                           "type": "Frame",
-                          "width": "20dp",
+                          "width": "1.2vw",
                           "height": "1dp",
                           "backgroundColor": "transparent"
                         },
                         {
                           "type": "Frame",
-                          "width": "280dp",
-                          "height": "164dp",
+                          "grow": 5,
+                          "height": "100%",
                           "backgroundColor": "@weatherHeroSoft",
-                          "borderRadius": "24dp",
-                          "paddingLeft": "18dp",
-                          "paddingRight": "18dp",
-                          "paddingTop": "18dp",
-                          "paddingBottom": "18dp",
+                          "borderRadius": "@cardRadius",
+                          "paddingLeft": "1.1vw",
+                          "paddingRight": "1.1vw",
+                          "paddingTop": "1vh",
+                          "paddingBottom": "1vh",
                           "items": [
                             {
                               "type": "Container",
+                              "width": "100%",
                               "height": "100%",
                               "direction": "column",
                               "justifyContent": "spaceBetween",
@@ -517,27 +638,29 @@
                                 {
                                   "type": "Text",
                                   "text": "오늘 요약",
-                                  "fontSize": "15dp",
+                                  "fontSize": "@fontCaptionDouble",
                                   "color": "#D3E4EC"
                                 },
                                 {
                                   "type": "Container",
+                                  "width": "100%",
                                   "direction": "row",
-                                  "justifyContent": "spaceBetween",
+                                  "justifyContent": "spaceAround",
                                   "items": [
                                     {
                                       "type": "Container",
+                                      "alignItems": "center",
                                       "items": [
                                         {
                                           "type": "Text",
                                           "text": "최고",
-                                          "fontSize": "14dp",
+                                          "fontSize": "@fontCaptionDouble",
                                           "color": "#BFD4DE"
                                         },
                                         {
                                           "type": "Text",
                                           "text": "${weatherData.tempMax}°",
-                                          "fontSize": "34dp",
+                                          "fontSize": "@weatherSummaryLabelTriple",
                                           "fontWeight": "900",
                                           "color": "@tempMax"
                                         }
@@ -545,17 +668,18 @@
                                     },
                                     {
                                       "type": "Container",
+                                      "alignItems": "center",
                                       "items": [
                                         {
                                           "type": "Text",
                                           "text": "최저",
-                                          "fontSize": "14dp",
+                                          "fontSize": "@fontCaptionDouble",
                                           "color": "#BFD4DE"
                                         },
                                         {
                                           "type": "Text",
                                           "text": "${weatherData.tempMin}°",
-                                          "fontSize": "34dp",
+                                          "fontSize": "@weatherSummaryLabelTriple",
                                           "fontWeight": "900",
                                           "color": "@tempMin"
                                         }
@@ -572,8 +696,10 @@
                                 {
                                   "type": "Text",
                                   "text": "체감 ${weatherData.feelsLike}° · 강수 최대 ${weatherData.popMax}%",
-                                  "fontSize": "16dp",
-                                  "color": "#E8F1F5"
+                                  "fontSize": "@weatherSummaryMetaDouble",
+                                  "color": "#E8F1F5",
+                                  "textAlign": "center",
+                                  "width": "100%"
                                 }
                               ]
                             }
@@ -586,185 +712,58 @@
                 {
                   "type": "Frame",
                   "width": "100%",
-                  "height": "14dp",
+                  "height": "@weatherSectionGap",
                   "backgroundColor": "transparent"
                 },
                 {
                   "type": "Container",
                   "width": "100%",
+                  "height": "@weatherStatsHeight",
                   "direction": "row",
                   "alignItems": "stretch",
                   "items": [
                     {
-                      "type": "Frame",
-                      "grow": 1,
-                      "height": "92dp",
-                      "backgroundColor": "@weatherChip",
-                      "borderRadius": "22dp",
-                      "paddingLeft": "16dp",
-                      "paddingRight": "16dp",
-                      "paddingTop": "16dp",
-                      "paddingBottom": "16dp",
-                      "items": [
-                        {
-                          "type": "Container",
-                          "height": "100%",
-                          "direction": "column",
-                          "justifyContent": "spaceBetween",
-                          "alignItems": "center",
-                          "items": [
-                            {
-                              "type": "Text",
-                              "text": "습도",
-                              "fontSize": "14dp",
-                              "color": "@textDim"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "${weatherData.humidity}%",
-                              "fontSize": "34dp",
-                              "fontWeight": "900",
-                              "color": "@textPrimary"
-                            }
-                          ]
-                        }
-                      ]
+                      "type": "StatCard",
+                      "label": "습도",
+                      "value": "${weatherData.humidity}%"
                     },
                     {
                       "type": "Frame",
-                      "width": "10dp",
-                      "height": "1dp",
+                      "width": "0.6vw",
                       "backgroundColor": "transparent"
                     },
                     {
-                      "type": "Frame",
-                      "grow": 1,
-                      "height": "92dp",
-                      "backgroundColor": "@weatherChip",
-                      "borderRadius": "22dp",
-                      "paddingLeft": "16dp",
-                      "paddingRight": "16dp",
-                      "paddingTop": "16dp",
-                      "paddingBottom": "16dp",
-                      "items": [
-                        {
-                          "type": "Container",
-                          "height": "100%",
-                          "direction": "column",
-                          "justifyContent": "spaceBetween",
-                          "alignItems": "center",
-                          "items": [
-                            {
-                              "type": "Text",
-                              "text": "바람",
-                              "fontSize": "14dp",
-                              "color": "@textDim"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "${weatherData.windSpeed}m/s",
-                              "fontSize": "34dp",
-                              "fontWeight": "900",
-                              "color": "@textPrimary"
-                            }
-                          ]
-                        }
-                      ]
+                      "type": "StatCard",
+                      "label": "바람",
+                      "value": "${weatherData.windSpeed}m/s"
                     },
                     {
                       "type": "Frame",
-                      "width": "10dp",
-                      "height": "1dp",
+                      "width": "0.6vw",
                       "backgroundColor": "transparent"
                     },
                     {
-                      "type": "Frame",
-                      "grow": 1,
-                      "height": "92dp",
-                      "backgroundColor": "@weatherChip",
-                      "borderRadius": "22dp",
-                      "paddingLeft": "16dp",
-                      "paddingRight": "16dp",
-                      "paddingTop": "16dp",
-                      "paddingBottom": "16dp",
-                      "items": [
-                        {
-                          "type": "Container",
-                          "height": "100%",
-                          "direction": "column",
-                          "justifyContent": "spaceBetween",
-                          "alignItems": "center",
-                          "items": [
-                            {
-                              "type": "Text",
-                              "text": "구름량",
-                              "fontSize": "14dp",
-                              "color": "@textDim"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "${weatherData.clouds}%",
-                              "fontSize": "34dp",
-                              "fontWeight": "900",
-                              "color": "@textPrimary"
-                            }
-                          ]
-                        }
-                      ]
+                      "type": "StatCard",
+                      "label": "구름량",
+                      "value": "${weatherData.clouds}%"
                     },
                     {
                       "type": "Frame",
-                      "width": "10dp",
-                      "height": "1dp",
+                      "width": "0.6vw",
                       "backgroundColor": "transparent"
                     },
                     {
-                      "type": "Frame",
-                      "grow": 1,
-                      "height": "92dp",
-                      "backgroundColor": "@weatherChip",
-                      "borderRadius": "22dp",
-                      "paddingLeft": "16dp",
-                      "paddingRight": "16dp",
-                      "paddingTop": "14dp",
-                      "paddingBottom": "14dp",
-                      "items": [
-                        {
-                          "type": "Container",
-                          "height": "100%",
-                          "direction": "column",
-                          "justifyContent": "spaceBetween",
-                          "alignItems": "center",
-                          "items": [
-                            {
-                              "type": "Text",
-                              "text": "일출 / 일몰",
-                              "fontSize": "14dp",
-                              "color": "@textDim"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "${weatherData.sunrise}",
-                              "fontSize": "28dp",
-                              "fontWeight": "900",
-                              "color": "@textPrimary"
-                            },
-                            {
-                              "type": "Text",
-                              "text": "일몰 ${weatherData.sunset}",
-                              "fontSize": "13dp",
-                              "color": "@textSecondary"
-                            }
-                          ]
-                        }
-                      ]
+                      "type": "StatCard",
+                      "label": "일출 / 일몰",
+                      "value": "${weatherData.sunrise}",
+                      "sub": "일몰 ${weatherData.sunset}"
                     }
                   ]
                 },
                 {
                   "type": "Frame",
                   "width": "100%",
-                  "height": "14dp",
+                  "height": "@weatherSectionGap",
                   "backgroundColor": "transparent"
                 },
                 {
@@ -772,14 +771,15 @@
                   "width": "100%",
                   "grow": 1,
                   "backgroundColor": "@weatherCard",
-                  "borderRadius": "28dp",
-                  "paddingLeft": "18dp",
-                  "paddingRight": "18dp",
-                  "paddingTop": "18dp",
-                  "paddingBottom": "18dp",
+                  "borderRadius": "@cardRadius",
+                  "paddingLeft": "1.2vw",
+                  "paddingRight": "1.2vw",
+                  "paddingTop": "1.2vh",
+                  "paddingBottom": "1.2vh",
                   "items": [
                     {
                       "type": "Container",
+                      "width": "100%",
                       "height": "100%",
                       "direction": "column",
                       "items": [
@@ -793,14 +793,14 @@
                             {
                               "type": "Text",
                               "text": "24시간 예보",
-                              "fontSize": "20dp",
+                              "fontSize": "@fontBody",
                               "fontWeight": "700",
                               "color": "@textPrimary"
                             },
                             {
                               "type": "Text",
                               "text": "3시간 단위",
-                              "fontSize": "13dp",
+                              "fontSize": "@fontMicro",
                               "color": "@textDim"
                             }
                           ]
@@ -808,7 +808,7 @@
                         {
                           "type": "Frame",
                           "width": "100%",
-                          "height": "12dp",
+                          "height": "@gapSm",
                           "backgroundColor": "transparent"
                         },
                         {
@@ -820,7 +820,7 @@
                         {
                           "type": "Frame",
                           "width": "100%",
-                          "height": "14dp",
+                          "height": "@gapSm",
                           "backgroundColor": "transparent"
                         },
                         {
@@ -834,20 +834,22 @@
                             {
                               "type": "Container",
                               "grow": 1,
-                              "paddingRight": "8dp",
+                              "paddingRight": "0.5vw",
                               "items": [
                                 {
                                   "type": "Frame",
+                                  "width": "100%",
                                   "height": "100%",
                                   "backgroundColor": "${data.pop > 0 ? '@forecastWet' : '@forecastCell'}",
-                                  "borderRadius": "22dp",
-                                  "paddingLeft": "8dp",
-                                  "paddingRight": "8dp",
-                                  "paddingTop": "12dp",
-                                  "paddingBottom": "12dp",
+                                  "borderRadius": "@chipRadius",
+                                  "paddingLeft": "0.4vw",
+                                  "paddingRight": "0.4vw",
+                                  "paddingTop": "0.8vh",
+                                  "paddingBottom": "0.8vh",
                                   "items": [
                                     {
                                       "type": "Container",
+                                      "width": "100%",
                                       "height": "100%",
                                       "direction": "column",
                                       "alignItems": "center",
@@ -855,7 +857,7 @@
                                         {
                                           "type": "Text",
                                           "text": "${data.time}",
-                                          "fontSize": "13dp",
+                                          "fontSize": "@fontMicro",
                                           "color": "@textDim",
                                           "textAlign": "center"
                                         },
@@ -867,26 +869,26 @@
                                         },
                                         {
                                           "type": "Frame",
-                                          "width": "14dp",
-                                          "height": "14dp",
+                                          "width": "1.8vh",
+                                          "height": "1.8vh",
                                           "backgroundColor": "${data.tempColor}",
-                                          "borderRadius": "7dp"
+                                          "borderRadius": "0.9vh"
                                         },
                                         {
                                           "type": "Text",
                                           "text": "${data.temp}°",
-                                          "fontSize": "22dp",
+                                          "fontSize": "@weatherForecastTemp",
                                           "fontWeight": "800",
                                           "color": "${data.tempColor}",
                                           "textAlign": "center",
-                                          "paddingTop": "8dp"
+                                          "paddingTop": "0.8vh"
                                         },
                                         {
                                           "type": "Text",
                                           "text": "${data.emoji}",
-                                          "fontSize": "30dp",
+                                          "fontSize": "@weatherForecastEmoji",
                                           "textAlign": "center",
-                                          "paddingTop": "4dp"
+                                          "paddingTop": "0.4vh"
                                         },
                                         {
                                           "type": "Frame",
@@ -897,7 +899,7 @@
                                         {
                                           "type": "Text",
                                           "text": "강수 ${data.pop}%",
-                                          "fontSize": "12dp",
+                                          "fontSize": "@fontMicro",
                                           "color": "${data.pop > 0 ? '#6EBBFF' : '#6F8393'}",
                                           "textAlign": "center"
                                         }
@@ -928,10 +930,10 @@
         "width": "100vw",
         "height": "100vh",
         "backgroundColor": "@bgDark",
-        "paddingLeft": "18dp",
-        "paddingRight": "18dp",
-        "paddingTop": "18dp",
-        "paddingBottom": "10dp",
+        "paddingLeft": "1.5vw",
+        "paddingRight": "1.5vw",
+        "paddingTop": "2vh",
+        "paddingBottom": "1.2vh",
         "direction": "column",
         "items": [
           {
@@ -944,11 +946,12 @@
               {
                 "type": "Container",
                 "grow": 1,
-                "paddingRight": "9dp",
+                "paddingRight": "0.7vw",
                 "items": [
                   {
                     "type": "BusPanel",
                     "busData": "${busData}",
+                    "width": "100%",
                     "height": "100%"
                   }
                 ]
@@ -956,36 +959,15 @@
               {
                 "type": "Container",
                 "grow": 2,
-                "paddingLeft": "9dp",
+                "paddingLeft": "0.7vw",
                 "items": [
                   {
                     "type": "WeatherPanel",
                     "weatherData": "${weatherData}",
+                    "width": "100%",
                     "height": "100%"
                   }
                 ]
-              }
-            ]
-          },
-          {
-            "type": "Container",
-            "width": "100%",
-            "direction": "row",
-            "justifyContent": "spaceBetween",
-            "alignItems": "center",
-            "paddingTop": "8dp",
-            "items": [
-              {
-                "type": "Text",
-                "text": "BusWatch Home",
-                "fontSize": "12dp",
-                "color": "@footerText"
-              },
-              {
-                "type": "Text",
-                "text": "갱신 ${busData.lastUpdated}",
-                "fontSize": "12dp",
-                "color": "@footerText"
               }
             ]
           }
