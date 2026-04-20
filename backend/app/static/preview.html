@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>BusWatch Home — Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; background: #05080C; color: #fff; font-family: -apple-system, 'Pretendard', 'Noto Sans KR', sans-serif; overflow: hidden; }
+    .stage { width: 100vw; height: 100vh; display: flex; flex-direction: column; padding: 18px 18px 10px; }
+    .main { flex: 1; min-height: 0; display: flex; gap: 18px; }
+    .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 8px; font-size: 12px; color: #485968; }
+
+    .panel { border-radius: 30px; overflow: hidden; min-height: 0; }
+    .bus-panel { flex: 1; background: #0E141B; padding: 24px; display: flex; flex-direction: column; align-items: center; }
+    .weather-panel { flex: 2; background: #0C141C; padding: 22px; display: flex; flex-direction: column; align-items: center; }
+
+    .section-label { font-size: 15px; color: #6F8393; text-align: center; width: 100%; }
+
+    .route-wrap { padding-top: 18px; text-align: center; width: 100%; }
+    .route-badge { width: 216px; height: 88px; border-radius: 22px; margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 42px; font-weight: 900; }
+    .route-blue { background: #1976D2; }
+    .route-red { background: #D32F2F; }
+    .route-green { background: #388E3C; }
+    .station-name { margin-top: 12px; font-size: 20px; color: #B6C6D3; text-align: center; }
+    .bus-main { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+    .bus-card { width: 100%; border-radius: 26px; padding: 22px; text-align: center; }
+    .bus-card.primary.green { background: #112218; }
+    .bus-card.primary.orange { background: #372413; }
+    .bus-card.primary.red { background: #321317; }
+    .bus-card.secondary { background: #121B24; margin-top: 14px; border-radius: 24px; padding: 18px 22px; }
+    .bus-card.message { background: #121B24; padding: 36px 24px; }
+    .bus-card.error { background: #241214; padding: 36px 24px; }
+    .bus-card .label { font-size: 18px; color: #B6C6D3; }
+    .bus-card .time-row { display: flex; align-items: flex-end; justify-content: center; margin-top: 6px; }
+    .bus-card .time { font-size: 110px; font-weight: 900; line-height: 1; }
+    .bus-card .unit { font-size: 30px; color: #B6C6D3; padding-left: 6px; padding-bottom: 20px; }
+    .bus-card .meta { margin-top: 4px; font-size: 16px; color: #6F8393; }
+    .bus-card .flag-icon { font-size: 72px; }
+    .bus-card .flag-text { margin-top: 12px; font-size: 24px; color: #B6C6D3; }
+    .bus-card .secondary-time { font-size: 72px; font-weight: 900; line-height: 1; }
+    .bus-card .secondary-unit { font-size: 24px; color: #B6C6D3; padding-left: 6px; padding-bottom: 14px; }
+    .accent-green { color: #59D47A; }
+    .accent-orange { color: #FFB347; }
+    .accent-red { color: #FF6B6B; }
+
+    .weather-header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+    .weather-header .city-label { font-size: 15px; color: #6F8393; }
+    .weather-header .city-name { font-size: 30px; font-weight: 900; color: #fff; margin-top: 4px; }
+    .update-pill { background: #16232D; color: #B6C6D3; border-radius: 999px; padding: 10px 14px; font-size: 13px; }
+
+    .hero { margin-top: 16px; height: 220px; width: 100%; background: #1B5265; border-radius: 28px; padding: 22px 24px; display: flex; justify-content: center; align-items: center; gap: 16px; }
+    .hero-main { display: flex; align-items: center; min-width: 0; }
+    .hero-emoji { font-size: 96px; margin-right: 14px; }
+    .hero-kicker { font-size: 16px; color: #D3E4EC; }
+    .hero-temp-row { display: flex; align-items: flex-end; }
+    .hero-temp { font-size: 96px; font-weight: 900; line-height: 1; }
+    .hero-degree { font-size: 44px; color: #D3E4EC; padding-bottom: 18px; }
+    .hero-desc { font-size: 22px; font-weight: 700; color: #E8F1F5; }
+    .hero-summary { width: 280px; height: 164px; background: #163D4B; border-radius: 24px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+    .hero-summary .title { font-size: 15px; color: #D3E4EC; }
+    .range-row { display: flex; justify-content: space-between; }
+    .range-box .label { font-size: 14px; color: #BFD4DE; }
+    .range-box .value.max { color: #FF8A4D; }
+    .range-box .value.min { color: #6EBBFF; }
+    .range-box .value { font-size: 34px; font-weight: 900; }
+    .hero-divider { height: 1px; background: #2F5867; }
+    .hero-meta { font-size: 16px; color: #E8F1F5; }
+
+    .stats { display: flex; gap: 10px; margin-top: 14px; width: 100%; justify-content: center; }
+    .stat-card { flex: 1; height: 92px; background: #16232D; border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-align: center; }
+    .stat-card .label { font-size: 14px; color: #6F8393; }
+    .stat-card .value { font-size: 34px; font-weight: 900; color: #fff; line-height: 1; }
+    .stat-card .sub { font-size: 13px; color: #B6C6D3; }
+
+    .forecast { flex: 1; min-height: 0; margin-top: 14px; width: 100%; background: #111B24; border-radius: 28px; padding: 18px; display: flex; flex-direction: column; }
+    .forecast-head { display: flex; justify-content: center; align-items: center; gap: 12px; text-align: center; }
+    .forecast-head .title { font-size: 20px; font-weight: 700; }
+    .forecast-head .sub { font-size: 13px; color: #6F8393; }
+    .forecast-divider { height: 1px; background: #253746; margin: 12px 0 14px; }
+    .forecast-row { flex: 1; min-height: 0; display: flex; gap: 8px; }
+    .forecast-cell { flex: 1; background: #16212B; border-radius: 22px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; min-height: 0; }
+    .forecast-cell.wet { background: #1B2A38; }
+    .forecast-time { font-size: 13px; color: #6F8393; }
+    .forecast-dot { width: 14px; height: 14px; border-radius: 7px; margin-top: 8px; }
+    .forecast-temp { margin-top: 8px; font-size: 22px; font-weight: 800; }
+    .forecast-emoji { margin-top: 4px; font-size: 30px; }
+    .forecast-spacer { width: 1px; background: transparent; }
+    .forecast-pop { margin-top: auto; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="main" id="main"></div>
+    <div class="footer" id="footer"></div>
+  </div>
+
+<script>
+let forceFlag = null;
+
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  return res.json();
+}
+
+function scaleForecast(forecast) {
+  if (!forecast || !forecast.length) return [];
+  const temps = forecast.map(point => point.temp);
+  const lo = Math.min(...temps);
+  const hi = Math.max(...temps);
+  const span = Math.max(hi - lo, 1);
+  return forecast.map(point => {
+    const ratio = (point.temp - lo) / span;
+    const topPadding = Math.round((1 - ratio) * 60);
+    const tempColor = point.temp <= 0 ? '#6EBBFF' : point.temp >= 25 ? '#FF8A4D' : '#FFFFFF';
+    return {
+      ...point,
+      topPadding,
+      tempColor,
+      popPct: Math.round(point.pop || 0),
+      tempRounded: Math.round(point.temp),
+    };
+  });
+}
+
+function routeClass(routeTypeName) {
+  if (/직행|좌석|광역/.test(routeTypeName || '')) return 'route-red';
+  if (/마을/.test(routeTypeName || '')) return 'route-green';
+  return 'route-blue';
+}
+
+function renderBus(bus, routeTypeName) {
+  const flag = forceFlag || bus.flag || 'RUN';
+  const predict1 = bus.predict_time1;
+  const predict2 = bus.predict_time2;
+  const tone = predict1 != null && predict1 <= 3 ? 'red' : predict1 != null && predict1 <= 7 ? 'orange' : 'green';
+
+  let body = '';
+  if ((flag === 'PASS' && predict1 == null) || flag === 'STOP') {
+    body = `
+      <div class="bus-main">
+        <div class="bus-card message">
+          <div class="flag-icon">${flag === 'PASS' ? '🌙' : '⏳'}</div>
+          <div class="flag-text">${flag === 'PASS' ? '운행이 종료되었습니다' : '운행 준비 중입니다'}</div>
+        </div>
+      </div>`;
+  } else if (flag === 'ERROR') {
+    body = `
+      <div class="bus-main">
+        <div class="bus-card error">
+          <div class="flag-icon">⚠️</div>
+          <div class="flag-text" style="color:#FF6B6B">버스 정보를 불러올 수 없습니다</div>
+        </div>
+      </div>`;
+  } else {
+    body = `
+      <div class="bus-main">
+        <div class="bus-card primary ${tone}">
+          <div class="label">다음 버스</div>
+          <div class="time-row">
+            <div class="time accent-${tone}">${predict1 != null ? predict1 : '--'}</div>
+            <div class="unit">분</div>
+          </div>
+          ${bus.location_no1 != null ? `<div class="meta">${bus.location_no1}개 전 · ${bus.station_nm1 || ''}</div>` : ''}
+          ${bus.low_plate1 === '1' ? `<div class="meta" style="margin-top:10px;color:#B6C6D3">저상버스 운행</div>` : ''}
+        </div>
+        ${predict2 != null ? `
+          <div class="bus-card secondary">
+            <div class="label" style="font-size:16px">다다음 버스</div>
+            <div class="time-row" style="margin-top:4px">
+              <div class="secondary-time">${predict2}</div>
+              <div class="secondary-unit">분</div>
+            </div>
+            ${bus.location_no2 != null ? `<div class="meta" style="font-size:15px">${bus.location_no2}개 전 · ${bus.station_nm2 || ''}</div>` : ''}
+          </div>` : ''}
+      </div>`;
+  }
+
+  return `
+    <section class="panel bus-panel">
+      <div class="section-label">실시간 버스</div>
+      <div class="route-wrap">
+        <div class="route-badge ${routeClass(routeTypeName)}">${bus.route_name || ''}</div>
+        <div class="station-name">${bus.station_name || ''}</div>
+      </div>
+      ${body}
+      <div class="footer" style="padding-top:18px;width:100%;justify-content:flex-end">
+        <span>업데이트 ${bus.last_updated || ''}</span>
+      </div>
+    </section>`;
+}
+
+function statCard(label, value, sub = '') {
+  return `
+    <div class="stat-card">
+      <div class="label">${label}</div>
+      <div class="value">${value}</div>
+      <div class="sub">${sub}</div>
+    </div>`;
+}
+
+function renderWeather(weather) {
+  if (!weather || weather.status === 'error') {
+    return `
+      <section class="panel weather-panel" style="justify-content:center;align-items:center;">
+        <div style="font-size:72px">🌡️</div>
+        <div style="margin-top:12px;font-size:24px;color:#B6C6D3">날씨 정보를 불러올 수 없습니다</div>
+      </section>`;
+  }
+
+  const forecast = scaleForecast(weather.forecast || []);
+  return `
+    <section class="panel weather-panel">
+      <div class="weather-header">
+        <div>
+          <div class="city-label">현재 날씨</div>
+          <div class="city-name">${weather.city || '현재 위치'}</div>
+        </div>
+        <div class="update-pill">업데이트 ${weather.last_updated || ''}</div>
+      </div>
+
+      <div class="hero">
+        <div class="hero-main">
+          <div class="hero-emoji">${weather.emoji}</div>
+          <div>
+            <div class="hero-kicker">오늘 날씨</div>
+            <div class="hero-temp-row">
+              <div class="hero-temp">${Math.round(weather.temp)}</div>
+              <div class="hero-degree">°</div>
+            </div>
+            <div class="hero-desc">${weather.description || ''}</div>
+          </div>
+        </div>
+        <div class="hero-summary">
+          <div class="title">오늘 요약</div>
+          <div class="range-row">
+            <div class="range-box">
+              <div class="label">최고</div>
+              <div class="value max">${Math.round(weather.temp_max)}°</div>
+            </div>
+            <div class="range-box">
+              <div class="label">최저</div>
+              <div class="value min">${Math.round(weather.temp_min)}°</div>
+            </div>
+          </div>
+          <div class="hero-divider"></div>
+          <div class="hero-meta">체감 ${Math.round(weather.feels_like)}° · 강수 최대 ${Math.round(weather.pop_max || 0)}%</div>
+        </div>
+      </div>
+
+      <div class="stats">
+        ${statCard('습도', `${weather.humidity}%`)}
+        ${statCard('바람', `${Math.round((weather.wind_speed || 0) * 10) / 10}m/s`)}
+        ${statCard('구름량', `${weather.clouds}%`)}
+        ${statCard('일출 / 일몰', weather.sunrise || '--:--', `일몰 ${weather.sunset || '--:--'}`)}
+      </div>
+
+      <div class="forecast">
+        <div class="forecast-head">
+          <div class="title">24시간 예보</div>
+          <div class="sub">3시간 단위</div>
+        </div>
+        <div class="forecast-divider"></div>
+        <div class="forecast-row">
+          ${forecast.map(point => `
+            <div class="forecast-cell ${point.popPct > 0 ? 'wet' : ''}">
+              <div class="forecast-time">${point.time}</div>
+              <div class="forecast-spacer" style="height:${point.topPadding}px"></div>
+              <div class="forecast-dot" style="background:${point.tempColor}"></div>
+              <div class="forecast-temp" style="color:${point.tempColor}">${point.tempRounded}°</div>
+              <div class="forecast-emoji">${point.emoji}</div>
+              <div class="forecast-pop" style="color:${point.popPct > 0 ? '#6EBBFF' : '#6F8393'}">강수 ${point.popPct}%</div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </section>`;
+}
+
+async function refresh() {
+  const [bus, weather, settings] = await Promise.all([
+    fetchJSON('/api/bus-arrival'),
+    fetchJSON('/api/weather'),
+    fetchJSON('/api/settings'),
+  ]);
+
+  document.getElementById('main').innerHTML = `
+    ${renderBus(bus, settings.route_type_name || '')}
+    ${renderWeather(weather)}`;
+
+  document.getElementById('footer').innerHTML = `
+    <span>BusWatch Home Preview</span>
+    <span>갱신 ${bus.last_updated || ''}</span>`;
+}
+
+refresh();
+setInterval(refresh, 60000);
+</script>
+</body>
+</html>

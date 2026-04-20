@@ -21,6 +21,7 @@ from app.config import (
     settings,
 )
 from app.gbis.client import BusArrivalInfo, get_bus_arrival
+from app.weather.client import WeatherInfo, get_weather
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,54 @@ def _get_route_type() -> str:
     return "blue"
 
 
-def _build_apl_datasource(info: BusArrivalInfo) -> dict:
+def _build_weather_payload(weather: WeatherInfo | None) -> dict | None:
+    if weather is None:
+        return None
+    # 온도 상대 위치를 0~60dp 스페이서로 변환 (더울수록 위 = 작은 paddingTop)
+    temps = [p.temp for p in weather.forecast]
+    if temps:
+        lo, hi = min(temps), max(temps)
+        span = max(hi - lo, 1.0)
+    else:
+        lo, hi, span = 0.0, 1.0, 1.0
+    points = []
+    for p in weather.forecast:
+        ratio = (p.temp - lo) / span  # 0..1 (1=가장 더움)
+        top_pad = int(round((1 - ratio) * 60))  # 0..60dp
+        if p.temp <= 0:
+            temp_color = "#42A5F5"
+        elif p.temp >= 25:
+            temp_color = "#FF7043"
+        else:
+            temp_color = "#FFFFFF"
+        points.append({
+            "time": p.time_label,
+            "temp": round(p.temp),
+            "emoji": p.emoji,
+            "pop": p.pop,
+            "topPadding": top_pad,
+            "tempColor": temp_color,
+        })
+    return {
+        "temp": round(weather.temp),
+        "feelsLike": round(weather.feels_like),
+        "tempMin": round(weather.temp_min),
+        "tempMax": round(weather.temp_max),
+        "description": weather.description,
+        "emoji": weather.emoji,
+        "city": weather.city,
+        "humidity": weather.humidity,
+        "windSpeed": round(weather.wind_speed, 1),
+        "clouds": weather.clouds,
+        "sunrise": weather.sunrise,
+        "sunset": weather.sunset,
+        "popMax": weather.pop_max,
+        "lastUpdated": weather.last_updated,
+        "forecast": points,
+    }
+
+
+def _build_apl_datasource(info: BusArrivalInfo, weather: WeatherInfo | None) -> dict:
     return {
         "busData": {
             "routeName": info.route_name,
@@ -59,19 +107,52 @@ def _build_apl_datasource(info: BusArrivalInfo) -> dict:
             "crowded1": info.crowded1,
             "crowded2": info.crowded2,
             "lastUpdated": info.last_updated,
-        }
+        },
+        "weatherData": _build_weather_payload(weather),
     }
 
 
-def _build_speech(info: BusArrivalInfo) -> str:
+def _build_speech(info: BusArrivalInfo, weather: WeatherInfo | None = None) -> str:
     if info.flag == "STOP" or (info.flag == "PASS" and info.predict_time1 is None):
-        return f"{info.route_name}번 버스는 현재 운행이 종료되었습니다."
-    if info.predict_time1 is None:
-        return f"{info.route_name}번 버스 도착 정보가 없습니다."
-    speech = f"{info.route_name}번 버스가 약 {info.predict_time1}분 후에 도착합니다."
-    if info.predict_time2 is not None:
-        speech += f" 그 다음 버스는 약 {info.predict_time2}분 후에 도착합니다."
+        speech = f"{info.route_name}번 버스는 현재 운행이 종료되었습니다."
+    elif info.predict_time1 is None:
+        speech = f"{info.route_name}번 버스 도착 정보가 없습니다."
+    else:
+        speech = f"{info.route_name}번 버스가 약 {info.predict_time1}분 후에 도착합니다."
+        if info.predict_time2 is not None:
+            speech += f" 그 다음 버스는 약 {info.predict_time2}분 후에 도착합니다."
+
+    if weather is not None:
+        speech += _build_weather_speech(weather)
     return speech
+
+
+def _build_weather_speech(weather: WeatherInfo) -> str:
+    desc = weather.description or "알 수 없음"
+    will_rain = False
+    # 현재 강수 관련 상태 또는 예보 pop > 30% 이상이면 비 예보로 간주
+    rain_keywords = ("비", "소나기", "이슬비", "진눈깨비", "눈")
+    if any(k in desc for k in rain_keywords):
+        will_rain = True
+    else:
+        try:
+            if (weather.pop_max or 0) >= 30:
+                will_rain = True
+        except Exception:
+            pass
+
+    rain_sentence = (
+        " 금일은 비가 올 수도 있습니다."
+        if will_rain
+        else " 금일은 비가 오지 않을 예정입니다."
+    )
+    return (
+        f" 현재 날씨는 {desc}입니다."
+        f"{rain_sentence}"
+        f" 현재 온도는 {round(weather.temp)}도,"
+        f" 금일 최고 온도는 {round(weather.temp_max)}도,"
+        f" 최저 온도는 {round(weather.temp_min)}도입니다."
+    )
 
 
 def _supports_apl(handler_input: HandlerInput) -> bool:
@@ -85,23 +166,50 @@ def _supports_apl(handler_input: HandlerInput) -> bool:
         return False
 
 
-def _add_apl_directive(handler_input: HandlerInput, info: BusArrivalInfo) -> None:
+def _add_apl_directive(
+    handler_input: HandlerInput,
+    info: BusArrivalInfo,
+    weather: WeatherInfo | None,
+) -> None:
     if not _supports_apl(handler_input):
         return
     handler_input.response_builder.add_directive(
         RenderDocumentDirective(
             token="busArrivalToken",
             document=load_apl_document("bus_arrival"),
-            datasources=_build_apl_datasource(info),
+            datasources=_build_apl_datasource(info, weather),
         )
     )
 
 
-async def _fetch_arrival() -> BusArrivalInfo:
-    return await get_bus_arrival()
+async def _fetch_all() -> tuple[BusArrivalInfo, WeatherInfo | None]:
+    results = await asyncio.gather(
+        get_bus_arrival(),
+        _safe_get_weather(),
+        return_exceptions=True,
+    )
+    bus_result, weather_result = results
+    if isinstance(bus_result, BaseException):
+        logger.exception("Failed to fetch bus arrival", exc_info=bus_result)
+        bus_info = _error_arrival_info()
+    else:
+        bus_info = bus_result
+    if isinstance(weather_result, BaseException):
+        weather_info = None
+    else:
+        weather_info = weather_result
+    return bus_info, weather_info
 
 
-def _fetch_arrival_sync() -> BusArrivalInfo:
+async def _safe_get_weather() -> WeatherInfo | None:
+    try:
+        return await get_weather()
+    except Exception:
+        logger.exception("Failed to fetch weather")
+        return None
+
+
+def _fetch_all_sync() -> tuple[BusArrivalInfo, WeatherInfo | None]:
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
@@ -110,8 +218,8 @@ def _fetch_arrival_sync() -> BusArrivalInfo:
     if loop and loop.is_running():
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor() as pool:
-            return pool.submit(asyncio.run, _fetch_arrival()).result()
-    return asyncio.run(_fetch_arrival())
+            return pool.submit(asyncio.run, _fetch_all()).result()
+    return asyncio.run(_fetch_all())
 
 
 def _error_arrival_info() -> BusArrivalInfo:
@@ -146,13 +254,14 @@ class LaunchRequestHandler(AbstractRequestHandler):
 
     def handle(self, handler_input: HandlerInput) -> Response:
         try:
-            info = _fetch_arrival_sync()
+            info, weather = _fetch_all_sync()
         except Exception:
             logger.exception("Failed to fetch bus arrival")
             info = _error_arrival_info()
+            weather = None
 
-        speech = _build_speech(info)
-        _add_apl_directive(handler_input, info)
+        speech = _build_speech(info, weather)
+        _add_apl_directive(handler_input, info, weather)
 
         return (
             handler_input.response_builder
@@ -169,13 +278,14 @@ class BusArrivalIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input: HandlerInput) -> Response:
         try:
-            info = _fetch_arrival_sync()
+            info, weather = _fetch_all_sync()
         except Exception:
             logger.exception("Failed to fetch bus arrival")
             info = _error_arrival_info()
+            weather = None
 
-        speech = _build_speech(info)
-        _add_apl_directive(handler_input, info)
+        speech = _build_speech(info, weather)
+        _add_apl_directive(handler_input, info, weather)
 
         return (
             handler_input.response_builder
@@ -197,12 +307,13 @@ class RefreshEventHandler(AbstractRequestHandler):
 
     def handle(self, handler_input: HandlerInput) -> Response:
         try:
-            info = _fetch_arrival_sync()
+            info, weather = _fetch_all_sync()
         except Exception:
             logger.exception("Failed to fetch bus arrival on refresh")
             info = _error_arrival_info()
+            weather = None
 
-        _add_apl_directive(handler_input, info)
+        _add_apl_directive(handler_input, info, weather)
 
         return (
             handler_input.response_builder

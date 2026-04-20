@@ -87,7 +87,7 @@
   </div>
 
 <script>
-let selected = { stationId: null, stationName: '', routeId: null, routeName: '', routeTypeName: '' };
+let selected = { stationId: null, stationName: '', routeId: null, routeName: '', routeTypeName: '', weatherLat: null, weatherLon: null };
 
 async function loadCurrent() {
   try {
@@ -118,7 +118,7 @@ async function searchStations() {
       return;
     }
     div.innerHTML = stations.map(s => `
-      <div class="result-item" onclick="selectStation(${s.stationId}, '${esc(s.stationName)}', '${esc(s.mobileNo)}')">
+      <div class="result-item" onclick="selectStation(${s.stationId}, '${esc(s.stationName)}', '${esc(s.mobileNo)}', ${s.x ?? 'null'}, ${s.y ?? 'null'})">
         <div><span class="name">${esc(s.stationName)}</span><br><span class="meta">${esc(s.regionName)}</span></div>
         <div style="text-align:right"><span class="meta">번호 ${esc(s.mobileNo)}</span><br><span class="meta">ID ${s.stationId}</span></div>
       </div>`).join('');
@@ -130,9 +130,11 @@ async function searchStations() {
   }
 }
 
-async function selectStation(id, name, mobileNo) {
+async function selectStation(id, name, mobileNo, x, y) {
   selected.stationId = id;
   selected.stationName = name;
+  selected.weatherLon = (typeof x === 'number') ? x : null;
+  selected.weatherLat = (typeof y === 'number') ? y : null;
   document.getElementById('selectedStationName').textContent = name + ' (' + mobileNo + ')';
   document.getElementById('routeSection').classList.remove('hidden');
   document.getElementById('saveSection').classList.add('hidden');
@@ -171,16 +173,21 @@ function selectRoute(id, name, typeName) {
 async function saveSettings() {
   const st = document.getElementById('saveStatus');
   try {
+    const payload = {
+      station_id: selected.stationId,
+      station_name: selected.stationName,
+      route_id: selected.routeId,
+      route_name: selected.routeName,
+      route_type_name: selected.routeTypeName
+    };
+    if (selected.weatherLat != null && selected.weatherLon != null) {
+      payload.weather_lat = selected.weatherLat;
+      payload.weather_lon = selected.weatherLon;
+    }
     const res = await fetch('/api/settings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        station_id: selected.stationId,
-        station_name: selected.stationName,
-        route_id: selected.routeId,
-        route_name: selected.routeName,
-        route_type_name: selected.routeTypeName
-      })
+      body: JSON.stringify(payload)
     });
     if (res.ok) {
       st.className = 'status ok';

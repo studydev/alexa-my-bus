@@ -20,6 +20,7 @@ from app.config import (
     settings,
 )
 from app.gbis.client import get_bus_arrival
+from app.weather.client import get_weather
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -89,12 +90,56 @@ async def bus_arrival_debug():
         return {"status": "error", "message": str(e)}
 
 
+@app.get("/api/weather")
+async def weather_debug():
+    """개발·디버깅용: OpenWeatherMap 호출 결과를 반환한다."""
+    try:
+        w = await get_weather()
+        return {
+            "temp": w.temp,
+            "feels_like": w.feels_like,
+            "temp_min": w.temp_min,
+            "temp_max": w.temp_max,
+            "description": w.description,
+            "main": w.main,
+            "icon": w.icon,
+            "emoji": w.emoji,
+            "city": w.city,
+            "humidity": w.humidity,
+            "wind_speed": w.wind_speed,
+            "clouds": w.clouds,
+            "sunrise": w.sunrise,
+            "sunset": w.sunset,
+            "pop_max": w.pop_max,
+            "last_updated": w.last_updated,
+            "forecast": [
+                {
+                    "time": p.time_label,
+                    "temp": p.temp,
+                    "icon": p.icon,
+                    "emoji": p.emoji,
+                    "pop": p.pop,
+                }
+                for p in w.forecast
+            ],
+        }
+    except Exception as e:
+        logger.exception("Weather API error")
+        return {"status": "error", "message": str(e)}
+
+
 # --- Settings Frontend & API ---
 
 
 @app.get("/settings")
 async def settings_page():
     return FileResponse(str(_STATIC_DIR / "settings.html"))
+
+
+@app.get("/preview")
+async def preview_page():
+    """APL 레이아웃 로컬 미리보기 (실시간 데이터)."""
+    return FileResponse(str(_STATIC_DIR / "preview.html"))
 
 
 @app.get("/api/settings")
@@ -105,13 +150,17 @@ async def get_settings_api():
         "station_name": dyn.get("station_name", settings.station_name),
         "route_id": dyn.get("route_id", settings.route_id),
         "route_name": dyn.get("route_name", settings.route_name),
+        "route_type_name": dyn.get("route_type_name", ""),
     }
 
 
 @app.put("/api/settings")
 async def update_settings_api(request: Request):
     data = await request.json()
-    allowed = {"station_id", "station_name", "route_id", "route_name", "route_type_name"}
+    allowed = {
+        "station_id", "station_name", "route_id", "route_name", "route_type_name",
+        "weather_lat", "weather_lon",
+    }
     filtered = {k: v for k, v in data.items() if k in allowed}
     # Validate types
     for int_key in ("station_id", "route_id"):
@@ -121,6 +170,16 @@ async def update_settings_api(request: Request):
             except (ValueError, TypeError):
                 return Response(
                     content=f'{{"error":"{int_key} must be an integer"}}',
+                    status_code=400,
+                    media_type="application/json",
+                )
+    for float_key in ("weather_lat", "weather_lon"):
+        if float_key in filtered:
+            try:
+                filtered[float_key] = float(filtered[float_key])
+            except (ValueError, TypeError):
+                return Response(
+                    content=f'{{"error":"{float_key} must be a number"}}',
                     status_code=400,
                     media_type="application/json",
                 )
@@ -153,6 +212,8 @@ async def search_stations(keyword: str):
             "stationName": s["stationName"],
             "mobileNo": s.get("mobileNo", "").strip(),
             "regionName": s.get("regionName", ""),
+            "x": s.get("x"),
+            "y": s.get("y"),
         }
         for s in stations
     ]

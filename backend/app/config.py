@@ -22,6 +22,11 @@ class Settings(BaseSettings):
     # 갱신 간격 (밀리초)
     refresh_interval_ms: int = 60000
 
+    # OpenWeatherMap
+    openweathermap_api_key: str = ""
+    weather_lat: float = 37.3885  # 목감중심상업지구 기본값
+    weather_lon: float = 126.8615
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
@@ -58,3 +63,11 @@ def get_active_route_name() -> str:
 
 def get_active_route_type_name() -> str:
     return load_dynamic_settings().get("route_type_name", "")
+
+
+def get_active_weather_lat() -> float:
+    return float(load_dynamic_settings().get("weather_lat", settings.weather_lat))
+
+
+def get_active_weather_lon() -> float:
+    return float(load_dynamic_settings().get("weather_lon", settings.weather_lon))
