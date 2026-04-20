@@ -55,12 +55,14 @@
               "type": "Container",
               "height": "100%",
               "direction": "column",
+              "alignItems": "center",
               "items": [
                 {
                   "type": "Text",
                   "text": "실시간 버스",
                   "fontSize": "15dp",
-                  "color": "@textDim"
+                  "color": "@textDim",
+                  "textAlign": "center"
                 },
                 {
                   "type": "Container",
@@ -323,20 +325,13 @@
                   ]
                 },
                 {
-                  "type": "Container",
+                  "type": "Text",
+                  "text": "업데이트 ${busData.lastUpdated}",
+                  "fontSize": "12dp",
+                  "color": "@footerText",
+                  "textAlign": "center",
                   "width": "100%",
-                  "direction": "row",
-                  "justifyContent": "end",
-                  "alignItems": "center",
-                  "paddingTop": "18dp",
-                  "items": [
-                    {
-                      "type": "Text",
-                      "text": "업데이트 ${busData.lastUpdated}",
-                      "fontSize": "12dp",
-                      "color": "@footerText"
-                    }
-                  ]
+                  "paddingTop": "18dp"
                 }
               ]
             }
@@ -395,49 +390,28 @@
               "type": "Container",
               "height": "100%",
               "direction": "column",
+              "alignItems": "center",
               "items": [
                 {
                   "type": "Container",
                   "width": "100%",
-                  "direction": "row",
-                  "justifyContent": "spaceBetween",
-                  "alignItems": "start",
+                  "alignItems": "center",
                   "items": [
                     {
-                      "type": "Container",
-                      "items": [
-                        {
-                          "type": "Text",
-                          "text": "현재 날씨",
-                          "fontSize": "15dp",
-                          "color": "@textDim"
-                        },
-                        {
-                          "type": "Text",
-                          "text": "${weatherData.city ? weatherData.city : '현재 위치'}",
-                          "fontSize": "30dp",
-                          "fontWeight": "900",
-                          "color": "@textPrimary",
-                          "paddingTop": "4dp"
-                        }
-                      ]
+                      "type": "Text",
+                      "text": "현재 날씨",
+                      "fontSize": "15dp",
+                      "color": "@textDim",
+                      "textAlign": "center"
                     },
                     {
-                      "type": "Frame",
-                      "backgroundColor": "@weatherChip",
-                      "borderRadius": "999dp",
-                      "paddingLeft": "14dp",
-                      "paddingRight": "14dp",
-                      "paddingTop": "8dp",
-                      "paddingBottom": "8dp",
-                      "items": [
-                        {
-                          "type": "Text",
-                          "text": "업데이트 ${weatherData.lastUpdated}",
-                          "fontSize": "13dp",
-                          "color": "@textSecondary"
-                        }
-                      ]
+                      "type": "Text",
+                      "text": "${weatherData.city ? weatherData.city : '현재 위치'}",
+                      "fontSize": "30dp",
+                      "fontWeight": "900",
+                      "color": "@textPrimary",
+                      "paddingTop": "4dp",
+                      "textAlign": "center"
                     }
                   ]
                 },
@@ -462,7 +436,7 @@
                       "type": "Container",
                       "height": "100%",
                       "direction": "row",
-                      "justifyContent": "spaceBetween",
+                      "justifyContent": "center",
                       "alignItems": "center",
                       "items": [
                         {
@@ -516,6 +490,12 @@
                               ]
                             }
                           ]
+                        },
+                        {
+                          "type": "Frame",
+                          "width": "20dp",
+                          "height": "1dp",
+                          "backgroundColor": "transparent"
                         },
                         {
                           "type": "Frame",
@@ -631,6 +611,7 @@
                           "height": "100%",
                           "direction": "column",
                           "justifyContent": "spaceBetween",
+                          "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
@@ -671,6 +652,7 @@
                           "height": "100%",
                           "direction": "column",
                           "justifyContent": "spaceBetween",
+                          "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
@@ -711,6 +693,7 @@
                           "height": "100%",
                           "direction": "column",
                           "justifyContent": "spaceBetween",
+                          "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
@@ -751,6 +734,7 @@
                           "height": "100%",
                           "direction": "column",
                           "justifyContent": "spaceBetween",
+                          "alignItems": "center",
                           "items": [
                             {
                               "type": "Text",
