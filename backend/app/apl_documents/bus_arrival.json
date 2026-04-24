@@ -570,7 +570,7 @@
                               "items": [
                                 {
                                   "type": "Text",
-                                  "text": "현재 날씨",
+                                  "text": "현재",
                                   "fontSize": "@fontCaptionDouble",
                                   "color": "#D3E4EC",
                                   "textAlign": "center",
@@ -651,7 +651,7 @@
                                       "items": [
                                         {
                                           "type": "Text",
-                                          "text": "오늘 요약",
+                                          "text": "오늘",
                                           "fontSize": "@fontCaptionDouble",
                                           "color": "#D3E4EC",
                                           "textAlign": "center",
@@ -718,7 +718,7 @@
                                       "items": [
                                         {
                                           "type": "Text",
-                                          "text": "내일 요약",
+                                          "text": "내일",
                                           "fontSize": "@fontCaptionDouble",
                                           "color": "#D3E4EC",
                                           "textAlign": "center",
