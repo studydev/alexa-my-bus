@@ -19,7 +19,7 @@ _OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 
 # 지원 음성 목록
 VOICES = {
-    "ava": "en-US-Ava:DragonHDOmniLatestNeural",
+    "ava": "en-US-Ava:DragonHDLatestNeural",
     "hyunsu": "ko-KR-HyunsuNeural",
 }
 
