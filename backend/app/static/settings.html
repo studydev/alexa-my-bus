@@ -37,6 +37,9 @@
     .loading { color: #78909C; padding: 12px; text-align: center; }
     .voice-hint { background: #263238; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 13px; color: #78909C; line-height: 1.6; }
     .voice-hint code { background: #37474F; padding: 2px 6px; border-radius: 4px; color: #80CBC4; }
+    .btn-voice { flex: 1; padding: 12px; border: 2px solid #333; border-radius: 8px; background: #2a2a2a; color: #e0e0e0; font-size: 15px; cursor: pointer; transition: all 0.2s; }
+    .btn-voice:hover { border-color: #42A5F5; }
+    .btn-voice.active { border-color: #42A5F5; background: #1E88E5; color: #fff; }
   </style>
 </head>
 <body>
@@ -57,6 +60,17 @@
       음성 호출: <code>Alexa, open my bus</code><br>
       도착 조회: <code>Alexa, ask my bus for next bus</code>
     </div>
+  </div>
+
+  <!-- 음성 엔진 선택 -->
+  <div class="card">
+    <h2>🔊 음성 엔진</h2>
+    <p class="step-indicator">Alexa 응답 음성을 선택하세요</p>
+    <div style="display:flex; gap:8px; margin-top:12px">
+      <button class="btn-voice" id="voiceAlexaBtn" onclick="setVoice('alexa')">Alexa 기본</button>
+      <button class="btn-voice" id="voiceAzureBtn" onclick="setVoice('azure')">Azure Ava (HD Omni)</button>
+    </div>
+    <div class="status" id="voiceStatus"></div>
   </div>
 
   <!-- Step 1: 정류소 검색 -->
@@ -97,6 +111,8 @@ async function loadCurrent() {
     document.getElementById('curStationId').textContent = d.station_id;
     document.getElementById('curRoute').textContent = d.route_name;
     document.getElementById('curRouteId').textContent = d.route_id;
+    // 음성 엔진 상태 반영
+    updateVoiceButtons(d.tts_engine || 'alexa');
   } catch (e) {
     document.getElementById('curStation').textContent = '로드 실패';
   }
@@ -204,6 +220,33 @@ async function saveSettings() {
 }
 
 function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function updateVoiceButtons(engine) {
+  document.getElementById('voiceAlexaBtn').classList.toggle('active', engine === 'alexa');
+  document.getElementById('voiceAzureBtn').classList.toggle('active', engine === 'azure');
+}
+
+async function setVoice(engine) {
+  const st = document.getElementById('voiceStatus');
+  try {
+    const res = await fetch('/api/settings', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tts_engine: engine })
+    });
+    if (res.ok) {
+      updateVoiceButtons(engine);
+      st.className = 'status ok';
+      st.textContent = engine === 'azure' ? '✅ Azure Ava 음성 적용' : '✅ Alexa 기본 음성 적용';
+    } else {
+      st.className = 'status error';
+      st.textContent = '❌ 저장 실패';
+    }
+  } catch (e) {
+    st.className = 'status error';
+    st.textContent = '❌ 네트워크 오류';
+  }
+}
 
 document.getElementById('searchInput').addEventListener('keypress', e => { if (e.key === 'Enter') searchStations(); });
 loadCurrent();

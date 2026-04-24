@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     weather_lat: float = 37.3885  # 목감중심상업지구 기본값
     weather_lon: float = 126.8615
 
+    # Azure Speech TTS
+    azure_speech_key: str = ""
+    azure_speech_region: str = "eastus"
+
+    # TTS 외부 접근 URL (Alexa가 MP3를 가져갈 주소)
+    tts_base_url: str = "https://bus.studydev.com"
+
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
 
@@ -71,3 +78,8 @@ def get_active_weather_lat() -> float:
 
 def get_active_weather_lon() -> float:
     return float(load_dynamic_settings().get("weather_lon", settings.weather_lon))
+
+
+def get_active_tts_engine() -> str:
+    """'alexa' (기본) 또는 'azure' 반환."""
+    return load_dynamic_settings().get("tts_engine", "alexa")

@@ -20,6 +20,7 @@ from app.config import (
     settings,
 )
 from app.gbis.client import get_bus_arrival
+from app.tts.client import OUTPUT_DIR
 from app.weather.client import get_weather
 
 logging.basicConfig(level=logging.INFO)
@@ -31,6 +32,10 @@ app = FastAPI(title="BusWatch Home", version="0.2.0")
 _STATIC_DIR = Path(__file__).resolve().parent / "static"
 _STATIC_DIR.mkdir(exist_ok=True)
 app.mount("/static", StaticFiles(directory=str(_STATIC_DIR)), name="static")
+
+# TTS MP3 출력 디렉토리 서빙
+OUTPUT_DIR.mkdir(exist_ok=True)
+app.mount("/output", StaticFiles(directory=str(OUTPUT_DIR)), name="output")
 
 # Alexa Skill
 skill = build_skill().create()
@@ -151,6 +156,7 @@ async def get_settings_api():
         "route_id": dyn.get("route_id", settings.route_id),
         "route_name": dyn.get("route_name", settings.route_name),
         "route_type_name": dyn.get("route_type_name", ""),
+        "tts_engine": dyn.get("tts_engine", "alexa"),
     }
 
 
@@ -159,7 +165,7 @@ async def update_settings_api(request: Request):
     data = await request.json()
     allowed = {
         "station_id", "station_name", "route_id", "route_name", "route_type_name",
-        "weather_lat", "weather_lon",
+        "weather_lat", "weather_lon", "tts_engine",
     }
     filtered = {k: v for k, v in data.items() if k in allowed}
     # Validate types
@@ -187,6 +193,13 @@ async def update_settings_api(request: Request):
         if str_key in filtered and not isinstance(filtered[str_key], str):
             return Response(
                 content=f'{{"error":"{str_key} must be a string"}}',
+                status_code=400,
+                media_type="application/json",
+            )
+    if "tts_engine" in filtered:
+        if filtered["tts_engine"] not in ("alexa", "azure"):
+            return Response(
+                content='{"error":"tts_engine must be alexa or azure"}',
                 status_code=400,
                 media_type="application/json",
             )

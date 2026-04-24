@@ -18,9 +18,11 @@ from app.config import (
     get_active_route_name,
     get_active_route_type_name,
     get_active_station_name,
+    get_active_tts_engine,
     settings,
 )
 from app.gbis.client import BusArrivalInfo, get_bus_arrival
+from app.tts.client import synthesize_speech
 from app.weather.client import WeatherInfo, get_weather
 
 logger = logging.getLogger(__name__)
@@ -168,6 +170,33 @@ def _supports_apl(handler_input: HandlerInput) -> bool:
         return False
 
 
+def _wrap_speech_with_azure_tts(speech_text: str) -> str:
+    """Azure TTS로 MP3를 생성하고 SSML <audio> 태그로 감싸 반환한다.
+    실패 시 원본 텍스트를 그대로 반환한다 (Alexa 기본 TTS 폴백).
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+
+    try:
+        if loop and loop.is_running():
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                filename = pool.submit(asyncio.run, synthesize_speech(speech_text)).result()
+        else:
+            filename = asyncio.run(synthesize_speech(speech_text))
+    except Exception:
+        logger.exception("Azure TTS 생성 실패, Alexa 기본 음성 사용")
+        return speech_text
+
+    if filename is None:
+        return speech_text
+
+    audio_url = f"{settings.tts_base_url}/output/{filename}"
+    return f'<audio src="{audio_url}"/>'
+
+
 def _add_apl_directive(
     handler_input: HandlerInput,
     info: BusArrivalInfo,
@@ -263,6 +292,8 @@ class LaunchRequestHandler(AbstractRequestHandler):
             weather = None
 
         speech = _build_speech(info, weather)
+        if get_active_tts_engine() == "azure":
+            speech = _wrap_speech_with_azure_tts(speech)
         _add_apl_directive(handler_input, info, weather)
 
         return (
@@ -287,6 +318,8 @@ class BusArrivalIntentHandler(AbstractRequestHandler):
             weather = None
 
         speech = _build_speech(info, weather)
+        if get_active_tts_engine() == "azure":
+            speech = _wrap_speech_with_azure_tts(speech)
         _add_apl_directive(handler_input, info, weather)
 
         return (
