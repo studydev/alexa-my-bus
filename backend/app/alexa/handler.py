@@ -319,6 +319,7 @@ class RefreshEventHandler(AbstractRequestHandler):
 
         return (
             handler_input.response_builder
+            .ask(" ")
             .set_should_end_session(False)
             .response
         )

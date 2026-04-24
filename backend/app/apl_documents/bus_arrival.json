@@ -687,6 +687,15 @@
                                               "color": "@tempMin"
                                             }
                                           ]
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "text": "체감 ${weatherData.feelsLike}°",
+                                          "fontSize": "@weatherSummaryMetaDouble",
+                                          "color": "#A8C4D4",
+                                          "textAlign": "center",
+                                          "width": "100%",
+                                          "paddingTop": "0.6vh"
                                         }
                                       ]
                                     }
@@ -754,34 +763,19 @@
                                               "color": "@tempMin"
                                             }
                                           ]
+                                        },
+                                        {
+                                          "type": "Text",
+                                          "text": "강수 ${weatherData.popMax}%",
+                                          "fontSize": "@weatherSummaryMetaDouble",
+                                          "color": "#A8C4D4",
+                                          "textAlign": "center",
+                                          "width": "100%",
+                                          "paddingTop": "0.6vh"
                                         }
                                       ]
                                     }
                                   ]
-                                }
-                              ]
-                            },
-                            {
-                              "type": "Frame",
-                              "width": "100%",
-                              "height": "0.8vh",
-                              "backgroundColor": "transparent"
-                            },
-                            {
-                              "type": "Frame",
-                              "width": "100%",
-                              "backgroundColor": "@weatherHeroSoft",
-                              "borderRadius": "@chipRadius",
-                              "paddingTop": "0.8vh",
-                              "paddingBottom": "0.8vh",
-                              "items": [
-                                {
-                                  "type": "Text",
-                                  "text": "체감 ${weatherData.feelsLike}° · 강수 최대 ${weatherData.popMax}%",
-                                  "fontSize": "@weatherSummaryMetaDouble",
-                                  "color": "#E8F1F5",
-                                  "textAlign": "center",
-                                  "width": "100%"
                                 }
                               ]
                             }
