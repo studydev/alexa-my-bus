@@ -405,6 +405,7 @@
           "items": [
             {
               "type": "Container",
+              "width": "100%",
               "height": "100%",
               "direction": "column",
               "justifyContent": "spaceBetween",
@@ -502,7 +503,7 @@
                   "items": [
                     {
                       "type": "Text",
-                      "text": "현재 날씨",
+                      "text": "날씨 정보",
                       "fontSize": "@fontCaptionDouble",
                       "color": "@textDim",
                       "textAlign": "center",
@@ -569,7 +570,7 @@
                               "items": [
                                 {
                                   "type": "Text",
-                                  "text": "오늘 날씨",
+                                  "text": "현재 날씨",
                                   "fontSize": "@fontCaptionDouble",
                                   "color": "#D3E4EC",
                                   "textAlign": "center",
@@ -618,70 +619,74 @@
                           "backgroundColor": "transparent"
                         },
                         {
-                          "type": "Frame",
+                          "type": "Container",
                           "grow": 5,
                           "height": "100%",
-                          "backgroundColor": "@weatherHeroSoft",
-                          "borderRadius": "@cardRadius",
-                          "paddingLeft": "1.1vw",
-                          "paddingRight": "1.1vw",
-                          "paddingTop": "1vh",
-                          "paddingBottom": "1vh",
+                          "direction": "column",
                           "items": [
                             {
                               "type": "Container",
                               "width": "100%",
-                              "height": "100%",
-                              "direction": "column",
-                              "justifyContent": "spaceBetween",
+                              "grow": 1,
+                              "direction": "row",
                               "items": [
                                 {
-                                  "type": "Text",
-                                  "text": "오늘 요약",
-                                  "fontSize": "@fontCaptionDouble",
-                                  "color": "#D3E4EC"
-                                },
-                                {
-                                  "type": "Container",
-                                  "width": "100%",
-                                  "direction": "row",
-                                  "justifyContent": "spaceAround",
+                                  "type": "Frame",
+                                  "grow": 1,
+                                  "height": "100%",
+                                  "backgroundColor": "@weatherHeroSoft",
+                                  "borderRadius": "@cardRadius",
+                                  "paddingLeft": "1vw",
+                                  "paddingRight": "1vw",
+                                  "paddingTop": "1vh",
+                                  "paddingBottom": "1vh",
                                   "items": [
                                     {
                                       "type": "Container",
+                                      "width": "100%",
+                                      "height": "100%",
+                                      "direction": "column",
+                                      "justifyContent": "center",
                                       "alignItems": "center",
                                       "items": [
                                         {
                                           "type": "Text",
-                                          "text": "최고",
+                                          "text": "오늘 요약",
                                           "fontSize": "@fontCaptionDouble",
-                                          "color": "#BFD4DE"
+                                          "color": "#D3E4EC",
+                                          "textAlign": "center",
+                                          "width": "100%",
+                                          "paddingBottom": "1vh"
                                         },
                                         {
-                                          "type": "Text",
-                                          "text": "${weatherData.tempMax}°",
-                                          "fontSize": "@weatherSummaryLabelTriple",
-                                          "fontWeight": "900",
-                                          "color": "@tempMax"
-                                        }
-                                      ]
-                                    },
-                                    {
-                                      "type": "Container",
-                                      "alignItems": "center",
-                                      "items": [
-                                        {
-                                          "type": "Text",
-                                          "text": "최저",
-                                          "fontSize": "@fontCaptionDouble",
-                                          "color": "#BFD4DE"
-                                        },
-                                        {
-                                          "type": "Text",
-                                          "text": "${weatherData.tempMin}°",
-                                          "fontSize": "@weatherSummaryLabelTriple",
-                                          "fontWeight": "900",
-                                          "color": "@tempMin"
+                                          "type": "Container",
+                                          "width": "100%",
+                                          "direction": "row",
+                                          "justifyContent": "center",
+                                          "alignItems": "baseline",
+                                          "items": [
+                                            {
+                                              "type": "Text",
+                                              "text": "${weatherData.tempMax}°",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "@tempMax"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "text": " / ",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "#BFD4DE"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "text": "${weatherData.tempMin}°",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "@tempMin"
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -689,10 +694,87 @@
                                 },
                                 {
                                   "type": "Frame",
-                                  "width": "100%",
-                                  "height": "1dp",
-                                  "backgroundColor": "#2F5867"
+                                  "width": "0.8vw",
+                                  "backgroundColor": "transparent"
                                 },
+                                {
+                                  "type": "Frame",
+                                  "grow": 1,
+                                  "height": "100%",
+                                  "backgroundColor": "@weatherHeroSoft",
+                                  "borderRadius": "@cardRadius",
+                                  "paddingLeft": "1vw",
+                                  "paddingRight": "1vw",
+                                  "paddingTop": "1vh",
+                                  "paddingBottom": "1vh",
+                                  "items": [
+                                    {
+                                      "type": "Container",
+                                      "width": "100%",
+                                      "height": "100%",
+                                      "direction": "column",
+                                      "justifyContent": "center",
+                                      "alignItems": "center",
+                                      "items": [
+                                        {
+                                          "type": "Text",
+                                          "text": "내일 요약",
+                                          "fontSize": "@fontCaptionDouble",
+                                          "color": "#D3E4EC",
+                                          "textAlign": "center",
+                                          "width": "100%",
+                                          "paddingBottom": "1vh"
+                                        },
+                                        {
+                                          "type": "Container",
+                                          "width": "100%",
+                                          "direction": "row",
+                                          "justifyContent": "center",
+                                          "alignItems": "baseline",
+                                          "items": [
+                                            {
+                                              "type": "Text",
+                                              "text": "${weatherData.tomorrowMax != null ? weatherData.tomorrowMax + '°' : '--'}",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "@tempMax"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "text": " / ",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "#BFD4DE"
+                                            },
+                                            {
+                                              "type": "Text",
+                                              "text": "${weatherData.tomorrowMin != null ? weatherData.tomorrowMin + '°' : '--'}",
+                                              "fontSize": "@weatherSummaryLabelTriple",
+                                              "fontWeight": "900",
+                                              "color": "@tempMin"
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "Frame",
+                              "width": "100%",
+                              "height": "0.8vh",
+                              "backgroundColor": "transparent"
+                            },
+                            {
+                              "type": "Frame",
+                              "width": "100%",
+                              "backgroundColor": "@weatherHeroSoft",
+                              "borderRadius": "@chipRadius",
+                              "paddingTop": "0.8vh",
+                              "paddingBottom": "0.8vh",
+                              "items": [
                                 {
                                   "type": "Text",
                                   "text": "체감 ${weatherData.feelsLike}° · 강수 최대 ${weatherData.popMax}%",

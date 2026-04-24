@@ -60,6 +60,8 @@ class WeatherInfo:
     sunrise: str
     sunset: str
     pop_max: int
+    tomorrow_min: float | None = None  # 내일 최저
+    tomorrow_max: float | None = None  # 내일 최고
     forecast: list[ForecastPoint] = field(default_factory=list)
     last_updated: str = ""
 
@@ -126,8 +128,11 @@ async def get_weather(
 
     # 금일(KST 기준) 전체 예보 포인트에서 min/max 계산
     today_kst = datetime.now(KST).date()
+    tomorrow_kst = today_kst + timedelta(days=1)
     today_min: float | None = None
     today_max: float | None = None
+    tomorrow_min: float | None = None
+    tomorrow_max: float | None = None
     forecast_points: list[ForecastPoint] = []
 
     for entry in fc.get("list", []):
@@ -137,6 +142,9 @@ async def get_weather(
         if dt_kst.date() == today_kst:
             today_min = temp if today_min is None else min(today_min, temp)
             today_max = temp if today_max is None else max(today_max, temp)
+        elif dt_kst.date() == tomorrow_kst:
+            tomorrow_min = temp if tomorrow_min is None else min(tomorrow_min, temp)
+            tomorrow_max = temp if tomorrow_max is None else max(tomorrow_max, temp)
 
     # 현재 온도도 min/max 계산에 포함
     cur_temp = float(main.get("temp", 0.0))
@@ -177,6 +185,8 @@ async def get_weather(
         sunrise=sunrise,
         sunset=sunset,
         pop_max=max((point.pop for point in forecast_points), default=0),
+        tomorrow_min=tomorrow_min,
+        tomorrow_max=tomorrow_max,
         forecast=forecast_points,
         last_updated=datetime.now(KST).strftime("%H:%M"),
     )

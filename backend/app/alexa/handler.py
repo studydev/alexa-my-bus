@@ -73,6 +73,8 @@ def _build_weather_payload(weather: WeatherInfo | None) -> dict | None:
         "feelsLike": round(weather.feels_like),
         "tempMin": round(weather.temp_min),
         "tempMax": round(weather.temp_max),
+        "tomorrowMin": round(weather.tomorrow_min) if weather.tomorrow_min is not None else None,
+        "tomorrowMax": round(weather.tomorrow_max) if weather.tomorrow_max is not None else None,
         "description": weather.description,
         "emoji": weather.emoji,
         "city": weather.city,

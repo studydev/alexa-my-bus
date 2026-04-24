@@ -21,3 +21,10 @@ Thumbs.db
 
 # Docker
 backend/.docker/
+
+# Docs
+docs/infrastructure.md
+docs/cicd.md
+
+# Makefile
+Makefile

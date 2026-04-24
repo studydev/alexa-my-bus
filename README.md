@@ -31,22 +31,30 @@ Echo Show 10/15 (APL 디스플레이)
 echo-bus/
 ├── .env.example                      # 환경변수 템플릿
 ├── .gitignore
+├── Makefile                          # 빌드·배포 자동화 (make deploy)
 ├── README.md
 ├── docs/
-│   └── bus.md                        # GBIS API 레퍼런스
+│   ├── bus.md                        # GBIS API 레퍼런스
+│   ├── infrastructure.md             # 인프라 환경 구성 (네트워크, 서버)
+│   └── cicd.md                       # CI/CD 자동화 방안
+├── scripts/
+│   └── deploy.sh                     # 원클릭 배포 스크립트
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                   # FastAPI 엔트리포인트
 │   │   ├── config.py                 # 환경변수 + 동적 설정 (settings.json)
 │   │   ├── gbis/
 │   │   │   └── client.py             # GBIS 도착정보 API 클라이언트 (httpx)
+│   │   ├── weather/
+│   │   │   └── client.py             # OpenWeatherMap 날씨 API 클라이언트
 │   │   ├── alexa/
 │   │   │   ├── handler.py            # Alexa Intent 핸들러
 │   │   │   └── apl.py                # APL 문서 로더
 │   │   ├── apl_documents/
 │   │   │   └── bus_arrival.json      # APL 디스플레이 템플릿
 │   │   └── static/
-│   │       └── settings.html         # 정류소/노선 설정 웹 UI
+│   │       ├── settings.html         # 정류소/노선 설정 웹 UI
+│   │       └── preview.html          # APL 미리보기
 │   ├── requirements.txt
 │   ├── Dockerfile
 │   ├── docker-compose.yml            # 이미지 빌드 전용
@@ -145,19 +153,26 @@ open http://localhost:8080/settings
 7. **Save** → **Build** → **Test** 탭에서 Development 모드
 8. 테스트: "open next bus"
 
-### 업데이트 배포
+### 배포 (TrueNAS)
 
-배포는 3단계로 진행합니다. 실행 관리는 TrueNAS Custom App에서 합니다.
+`make deploy` 한 줄로 rsync → Docker 빌드 → 컨테이너 재시작 → 헬스체크를 자동 수행합니다.
 
 ```bash
-# 1. 파일 전송
-rsync -avz --delete backend/ studydev@192.168.1.92:/mnt/workspace/custom_apps/echo-bus/backend/
-
-# 2. 이미지 빌드 (서버에서)
-ssh studydev@192.168.1.92 "cd /mnt/workspace/custom_apps/echo-bus/backend && sudo docker compose build"
-
-# 3. TrueNAS 웹 UI → Apps → bus-watch → 재시작
+make deploy        # 원클릭 배포 (sync → build → restart → health check)
+make sync          # 소스 동기화만
+make build         # sync + 이미지 빌드
+make logs          # 컨테이너 실시간 로그
+make health        # 헬스체크
 ```
+
+또는 독립 스크립트를 사용할 수 있습니다:
+
+```bash
+./scripts/deploy.sh          # 기본 배포
+./scripts/deploy.sh --test   # 테스트 후 배포
+```
+
+인프라 환경 상세는 `docs/infrastructure.md`, CI/CD 고도화 방안은 `docs/cicd.md`를 참조하세요.
 
 ### 컨테이너 관리
 
