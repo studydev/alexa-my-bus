@@ -197,9 +197,9 @@ async def update_settings_api(request: Request):
                 media_type="application/json",
             )
     if "tts_engine" in filtered:
-        if filtered["tts_engine"] not in ("alexa", "azure"):
+        if filtered["tts_engine"] not in ("alexa", "azure", "azure_ko"):
             return Response(
-                content='{"error":"tts_engine must be alexa or azure"}',
+                content='{"error":"tts_engine must be alexa, azure, or azure_ko"}',
                 status_code=400,
                 media_type="application/json",
             )

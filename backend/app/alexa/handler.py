@@ -170,7 +170,7 @@ def _supports_apl(handler_input: HandlerInput) -> bool:
         return False
 
 
-def _wrap_speech_with_azure_tts(speech_text: str) -> str:
+def _wrap_speech_with_azure_tts(speech_text: str, voice: str = "ava") -> str:
     """Azure TTS로 MP3를 생성하고 SSML <audio> 태그로 감싸 반환한다.
     실패 시 원본 텍스트를 그대로 반환한다 (Alexa 기본 TTS 폴백).
     """
@@ -183,9 +183,9 @@ def _wrap_speech_with_azure_tts(speech_text: str) -> str:
         if loop and loop.is_running():
             import concurrent.futures
             with concurrent.futures.ThreadPoolExecutor() as pool:
-                filename = pool.submit(asyncio.run, synthesize_speech(speech_text)).result()
+                filename = pool.submit(asyncio.run, synthesize_speech(speech_text, voice)).result()
         else:
-            filename = asyncio.run(synthesize_speech(speech_text))
+            filename = asyncio.run(synthesize_speech(speech_text, voice))
     except Exception:
         logger.exception("Azure TTS 생성 실패, Alexa 기본 음성 사용")
         return speech_text
@@ -292,8 +292,10 @@ class LaunchRequestHandler(AbstractRequestHandler):
             weather = None
 
         speech = _build_speech(info, weather)
-        if get_active_tts_engine() == "azure":
-            speech = _wrap_speech_with_azure_tts(speech)
+        tts_engine = get_active_tts_engine()
+        if tts_engine in ("azure", "azure_ko"):
+            voice = "hyunsu" if tts_engine == "azure_ko" else "ava"
+            speech = _wrap_speech_with_azure_tts(speech, voice)
         _add_apl_directive(handler_input, info, weather)
 
         return (
@@ -318,8 +320,10 @@ class BusArrivalIntentHandler(AbstractRequestHandler):
             weather = None
 
         speech = _build_speech(info, weather)
-        if get_active_tts_engine() == "azure":
-            speech = _wrap_speech_with_azure_tts(speech)
+        tts_engine = get_active_tts_engine()
+        if tts_engine in ("azure", "azure_ko"):
+            voice = "hyunsu" if tts_engine == "azure_ko" else "ava"
+            speech = _wrap_speech_with_azure_tts(speech, voice)
         _add_apl_directive(handler_input, info, weather)
 
         return (

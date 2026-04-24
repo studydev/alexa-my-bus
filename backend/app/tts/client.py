@@ -1,4 +1,4 @@
-"""Azure Speech TTS 클라이언트 — Dragon HD Omni (Ava) 음성으로 MP3 생성."""
+"""Azure Speech TTS 클라이언트 — Ava (Dragon HD Omni) / Hyunsu (한국어) 음성으로 MP3 생성."""
 
 from __future__ import annotations
 
@@ -16,7 +16,12 @@ logger = logging.getLogger(__name__)
 # Alexa <audio> 태그 요구사항에 맞는 출력 포맷
 # MP3, 48kbps, 24kHz, mono (MPEG version 2)
 _OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
-_VOICE_NAME = "en-US-Ava:DragonHDOmniLatestNeural"
+
+# 지원 음성 목록
+VOICES = {
+    "ava": "en-US-Ava:DragonHDOmniLatestNeural",
+    "hyunsu": "ko-KR-HyunsuNeural",
+}
 
 # MP3 저장 디렉토리
 OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "output"
@@ -37,8 +42,12 @@ def _cleanup_old_files() -> None:
                 pass
 
 
-async def synthesize_speech(text: str) -> str | None:
+async def synthesize_speech(text: str, voice: str = "ava") -> str | None:
     """텍스트를 Azure TTS로 변환하여 MP3 파일로 저장하고 파일명을 반환한다.
+
+    Args:
+        text: 변환할 텍스트.
+        voice: "ava" (Dragon HD Omni, 다국어) 또는 "hyunsu" (한국어 네이티브).
 
     Returns:
         MP3 파일명 (예: "abc123.mp3") 또는 실패 시 None.
@@ -51,8 +60,10 @@ async def synthesize_speech(text: str) -> str | None:
 
     _cleanup_old_files()
 
-    # 파일명: 텍스트 해시 기반 (동일 텍스트 → 캐시 활용)
-    text_hash = hashlib.md5(text.encode()).hexdigest()[:12]
+    voice_name = VOICES.get(voice, VOICES["ava"])
+
+    # 파일명: 음성 + 텍스트 해시 기반 (동일 텍스트 → 캐시 활용)
+    text_hash = hashlib.md5(f"{voice}:{text}".encode()).hexdigest()[:12]
     filename = f"{text_hash}.mp3"
     filepath = OUTPUT_DIR / filename
 
@@ -61,14 +72,24 @@ async def synthesize_speech(text: str) -> str | None:
         logger.info("TTS 캐시 히트: %s", filename)
         return filename
 
-    # SSML 생성 — lang 힌트로 한국어 발음 최적화
-    ssml = (
-        '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" '
-        'xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="en-US">'
-        f'<voice name="{_VOICE_NAME}">'
-        f'<lang xml:lang="ko-KR">{_escape_xml(text)}</lang>'
-        '</voice></speak>'
-    )
+    # SSML 생성
+    escaped = _escape_xml(text)
+    if voice == "hyunsu":
+        # 한국어 네이티브 보이스 — lang 래퍼 불필요
+        ssml = (
+            '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" '
+            f'xml:lang="ko-KR"><voice name="{voice_name}">'
+            f'{escaped}</voice></speak>'
+        )
+    else:
+        # Ava (다국어) — lang 힌트로 한국어 발음 최적화
+        ssml = (
+            '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" '
+            'xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="en-US">'
+            f'<voice name="{voice_name}">'
+            f'<lang xml:lang="ko-KR">{escaped}</lang>'
+            '</voice></speak>'
+        )
 
     url = f"https://{region}.tts.speech.microsoft.com/cognitiveservices/v1"
     headers = {

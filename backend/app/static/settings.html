@@ -66,9 +66,10 @@
   <div class="card">
     <h2>🔊 음성 엔진</h2>
     <p class="step-indicator">Alexa 응답 음성을 선택하세요</p>
-    <div style="display:flex; gap:8px; margin-top:12px">
+    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap">
       <button class="btn-voice" id="voiceAlexaBtn" onclick="setVoice('alexa')">Alexa 기본</button>
       <button class="btn-voice" id="voiceAzureBtn" onclick="setVoice('azure')">Azure Ava (HD Omni)</button>
+      <button class="btn-voice" id="voiceAzureKoBtn" onclick="setVoice('azure_ko')">Azure 현수 (한국어)</button>
     </div>
     <div class="status" id="voiceStatus"></div>
   </div>
@@ -224,6 +225,7 @@ function esc(s) { const d = document.createElement('div'); d.textContent = s; re
 function updateVoiceButtons(engine) {
   document.getElementById('voiceAlexaBtn').classList.toggle('active', engine === 'alexa');
   document.getElementById('voiceAzureBtn').classList.toggle('active', engine === 'azure');
+  document.getElementById('voiceAzureKoBtn').classList.toggle('active', engine === 'azure_ko');
 }
 
 async function setVoice(engine) {
@@ -237,7 +239,8 @@ async function setVoice(engine) {
     if (res.ok) {
       updateVoiceButtons(engine);
       st.className = 'status ok';
-      st.textContent = engine === 'azure' ? '✅ Azure Ava 음성 적용' : '✅ Alexa 기본 음성 적용';
+      const labels = { alexa: '✅ Alexa 기본 음성 적용', azure: '✅ Azure Ava 음성 적용', azure_ko: '✅ Azure 현수 음성 적용' };
+      st.textContent = labels[engine] || '✅ 저장 완료';
     } else {
       st.className = 'status error';
       st.textContent = '❌ 저장 실패';
