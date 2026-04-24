@@ -14,8 +14,8 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 # Alexa <audio> 태그 요구사항에 맞는 출력 포맷
-# MP3, 48kbps, 16kHz, mono
-_OUTPUT_FORMAT = "audio-16khz-48kbitrate-mono-mp3"
+# MP3, 48kbps, 24kHz, mono (MPEG version 2)
+_OUTPUT_FORMAT = "audio-24khz-48kbitrate-mono-mp3"
 _VOICE_NAME = "en-US-Ava:DragonHDOmniLatestNeural"
 
 # MP3 저장 디렉토리
