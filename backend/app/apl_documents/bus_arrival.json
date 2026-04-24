@@ -837,8 +837,7 @@
                     {
                       "type": "StatCard",
                       "label": "일출 / 일몰",
-                      "value": "${weatherData.sunrise}",
-                      "sub": "일몰 ${weatherData.sunset}"
+                      "value": "${weatherData.sunrise} / ${weatherData.sunset}"
                     }
                   ]
                 },
