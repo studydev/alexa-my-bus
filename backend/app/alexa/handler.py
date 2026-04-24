@@ -118,13 +118,13 @@ def _build_apl_datasource(info: BusArrivalInfo, weather: WeatherInfo | None) -> 
 
 def _build_speech(info: BusArrivalInfo, weather: WeatherInfo | None = None) -> str:
     if info.flag == "STOP" or (info.flag == "PASS" and info.predict_time1 is None):
-        speech = f"{info.route_name}번 버스는 현재 운행이 종료되었습니다."
+        speech = f"{info.route_name} 번 버스는 현재 운행이 종료되었습니다."
     elif info.predict_time1 is None:
-        speech = f"{info.route_name}번 버스 도착 정보가 없습니다."
+        speech = f"{info.route_name} 번 버스 도착 정보가 없습니다."
     else:
-        speech = f"{info.route_name}번 버스가 약 {info.predict_time1}분 후에 도착합니다."
+        speech = f"{info.route_name} 번 버스가 약 {info.predict_time1} 분 후에 도착합니다."
         if info.predict_time2 is not None:
-            speech += f" 그 다음 버스는 약 {info.predict_time2}분 후에 도착합니다."
+            speech += f" 그 다음 버스는 약 {info.predict_time2} 분 후에 도착합니다."
 
     if weather is not None:
         speech += _build_weather_speech(weather)
